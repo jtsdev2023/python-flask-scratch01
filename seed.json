@@ -1,0 +1,86 @@
+[
+	{
+		"title": "The Shawshank Redemption",
+		"genre": "Drama",
+		"release_year": 1994,
+		"rental_price": 3.99,
+		"director": "Frank Darabont"
+	},
+	{
+		"title": "The Dark Knight",
+		"genre": "Action",
+		"release_year": 2008,
+		"rental_price": 4.99,
+		"director": "Christopher Nolan"
+	},
+	{
+		"title": "Inception",
+		"genre": "Sci-Fi",
+		"release_year": 2010,
+		"rental_price": 4.99,
+		"director": "Christopher Nolan"
+	},
+	{
+		"title": "Forrest Gump",
+		"genre": "Drama",
+		"release_year": 1994,
+		"rental_price": 3.99,
+		"director": "Robert Zemeckis"
+	},
+	{
+		"title": "The Matrix",
+		"genre": "Sci-Fi",
+		"release_year": 1999,
+		"rental_price": 4.99,
+		"director": "Lana Wachowski, Lilly Wachowski"
+	},
+	{
+		"title": "Titanic",
+		"genre": "Romance",
+		"release_year": 1997,
+		"rental_price": 3.99,
+		"director": "James Cameron"
+	},
+	{
+		"title": "Jaws",
+		"genre": "Thriller",
+		"release_year": 1975,
+		"rental_price": 2.99,
+		"director": "Steven Spielberg"
+	},
+	{
+		"title": "Pulp Fiction",
+		"genre": "Crime",
+		"release_year": 1994,
+		"rental_price": 4.99,
+		"director": "Quentin Tarantino"
+	},
+	{
+		"title": "The Godfather",
+		"genre": "Crime",
+		"release_year": 1972,
+		"rental_price": 4.99,
+		"director": "Francis Ford Coppola"
+	},
+	{
+		"title": "Interstellar",
+		"genre": "Sci-Fi",
+		"release_year": 2014,
+		"rental_price": 5.99,
+		"director": "Christopher Nolan"
+	},
+	{
+		"title": "Spirited Away",
+		"genre": "Animation",
+		"release_year": 2001,
+		"rental_price": 3.99,
+		"director": "Hayao Miyazaki"
+	},
+	{
+		"title": "The Avengers",
+		"genre": "Action",
+		"release_year": 2012,
+		"rental_price": 4.99,
+		"director": "Joss Whedon"
+	}
+]
