@@ -1,86 +1,134 @@
 [
-	{
-		"title": "The Shawshank Redemption",
-		"genre": "Drama",
-		"release_year": 1994,
-		"rental_price": 3.99,
-		"director": "Frank Darabont"
-	},
-	{
-		"title": "The Dark Knight",
-		"genre": "Action",
-		"release_year": 2008,
-		"rental_price": 4.99,
-		"director": "Christopher Nolan"
-	},
-	{
-		"title": "Inception",
-		"genre": "Sci-Fi",
-		"release_year": 2010,
-		"rental_price": 4.99,
-		"director": "Christopher Nolan"
-	},
-	{
-		"title": "Forrest Gump",
-		"genre": "Drama",
-		"release_year": 1994,
-		"rental_price": 3.99,
-		"director": "Robert Zemeckis"
-	},
-	{
-		"title": "The Matrix",
-		"genre": "Sci-Fi",
-		"release_year": 1999,
-		"rental_price": 4.99,
-		"director": "Lana Wachowski, Lilly Wachowski"
-	},
-	{
-		"title": "Titanic",
-		"genre": "Romance",
-		"release_year": 1997,
-		"rental_price": 3.99,
-		"director": "James Cameron"
-	},
-	{
-		"title": "Jaws",
-		"genre": "Thriller",
-		"release_year": 1975,
-		"rental_price": 2.99,
-		"director": "Steven Spielberg"
-	},
-	{
-		"title": "Pulp Fiction",
-		"genre": "Crime",
-		"release_year": 1994,
-		"rental_price": 4.99,
-		"director": "Quentin Tarantino"
-	},
-	{
-		"title": "The Godfather",
-		"genre": "Crime",
-		"release_year": 1972,
-		"rental_price": 4.99,
-		"director": "Francis Ford Coppola"
-	},
-	{
-		"title": "Interstellar",
-		"genre": "Sci-Fi",
-		"release_year": 2014,
-		"rental_price": 5.99,
-		"director": "Christopher Nolan"
-	},
-	{
-		"title": "Spirited Away",
-		"genre": "Animation",
-		"release_year": 2001,
-		"rental_price": 3.99,
-		"director": "Hayao Miyazaki"
-	},
-	{
-		"title": "The Avengers",
-		"genre": "Action",
-		"release_year": 2012,
-		"rental_price": 4.99,
-		"director": "Joss Whedon"
-	}
+    {
+        "title": "The Shawshank Redemption",
+        "genre": "Drama",
+        "release_year": 1994,
+        "rental_price": 3.99,
+        "director": "Frank Darabont",
+        "total_copies": 1,
+        "available_copies": 1,
+        "is_active": true,
+        "description": "Two imprisoned men form a lasting friendship while hoping for redemption and freedom."
+    },
+    {
+        "title": "The Dark Knight",
+        "genre": "Action",
+        "release_year": 2008,
+        "rental_price": 4.99,
+        "director": "Christopher Nolan",
+        "total_copies": 1,
+        "available_copies": 1,
+        "is_active": true,
+        "description": "Batman faces the Joker in a tense battle that pushes Gotham to its limits."
+    },
+    {
+        "title": "Inception",
+        "genre": "Sci-Fi",
+        "release_year": 2010,
+        "rental_price": 4.99,
+        "director": "Christopher Nolan",
+        "total_copies": 1,
+        "available_copies": 1,
+        "is_active": true,
+        "description": "A skilled thief enters dreams to plant an idea deep within a target's mind."
+    },
+    {
+        "title": "Forrest Gump",
+        "genre": "Drama",
+        "release_year": 1994,
+        "rental_price": 3.99,
+        "director": "Robert Zemeckis",
+        "total_copies": 1,
+        "available_copies": 1,
+        "is_active": true,
+        "description": "A kindhearted man witnesses and influences major American events across decades."
+    },
+    {
+        "title": "The Matrix",
+        "genre": "Sci-Fi",
+        "release_year": 1999,
+        "rental_price": 4.99,
+        "director": "Lana Wachowski, Lilly Wachowski",
+        "total_copies": 1,
+        "available_copies": 1,
+        "is_active": true,
+        "description": "A hacker discovers reality is a simulation and joins a rebellion against its controllers."
+    },
+    {
+        "title": "Titanic",
+        "genre": "Romance",
+        "release_year": 1997,
+        "rental_price": 3.99,
+        "director": "James Cameron",
+        "total_copies": 1,
+        "available_copies": 1,
+        "is_active": true,
+        "description": "A romance unfolds aboard the ill-fated Titanic during its doomed maiden voyage."
+    },
+    {
+        "title": "Jaws",
+        "genre": "Thriller",
+        "release_year": 1975,
+        "rental_price": 2.99,
+        "director": "Steven Spielberg",
+        "total_copies": 1,
+        "available_copies": 1,
+        "is_active": true,
+        "description": "A coastal town is terrorized by a great white shark during the busy summer season."
+    },
+    {
+        "title": "Pulp Fiction",
+        "genre": "Crime",
+        "release_year": 1994,
+        "rental_price": 4.99,
+        "director": "Quentin Tarantino",
+        "total_copies": 1,
+        "available_copies": 1,
+        "is_active": true,
+        "description": "Interwoven crime stories collide in a stylish and unpredictable Los Angeles underworld."
+    },
+    {
+        "title": "The Godfather",
+        "genre": "Crime",
+        "release_year": 1972,
+        "rental_price": 4.99,
+        "director": "Francis Ford Coppola",
+        "total_copies": 1,
+        "available_copies": 1,
+        "is_active": true,
+        "description": "The aging patriarch of a crime family passes power and conflict to his son."
+    },
+    {
+        "title": "Interstellar",
+        "genre": "Sci-Fi",
+        "release_year": 2014,
+        "rental_price": 5.99,
+        "director": "Christopher Nolan",
+        "total_copies": 1,
+        "available_copies": 1,
+        "is_active": true,
+        "description": "Explorers travel through a wormhole to search for a new home for humanity."
+    },
+    {
+        "title": "Spirited Away",
+        "genre": "Animation",
+        "release_year": 2001,
+        "rental_price": 3.99,
+        "director": "Hayao Miyazaki",
+        "total_copies": 1,
+        "available_copies": 1,
+        "is_active": true,
+        "description": "A young girl enters a magical spirit world and must find the courage to save her parents."
+    },
+    {
+        "title": "The Avengers",
+        "genre": "Action",
+        "release_year": 2012,
+        "rental_price": 4.99,
+        "director": "Joss Whedon",
+        "total_copies": 1,
+        "available_copies": 1,
+        "is_active": true,
+        "description": "Earth's mightiest heroes unite to stop a powerful threat from conquering the planet."
+    }
 ]
