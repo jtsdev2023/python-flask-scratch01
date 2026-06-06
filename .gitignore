@@ -1,8 +1,82 @@
-__pycache__/
-*.pyc
-.venv/
-*venv/
-.env
-*.db
-.DS_Store
+# __pycache__/
+# *.pyc
+# .venv/
+# *venv/
+# .env
+# *.db
+# .DS_Store
+# .vscode/
+
+
+# Backend
+backend/__pycache__/
+backend/*.pyc
+backend/*.pyo
+backend/*.pyd
+backend/.Python
+backend/build/
+backend/develop-eggs/
+backend/dist/
+backend/downloads/
+backend/eggs/
+backend/.eggs/
+backend/lib/
+backend/lib64/
+backend/parts/
+backend/sdist/
+backend/var/
+backend/wheels/
+backend/pip-wheel-metadata/
+backend/share/python-wheels/
+backend/*.egg-info/
+backend/.installed.cfg
+backend/*.egg
+backend/MANIFEST
+backend/.venv
+backend/venv/
+backend/ENV/
+backend/env/
+backend/.env
+backend/dvdrental.db
+backend/instance/
+
+# Frontend
+frontend/node_modules/
+frontend/build/
+frontend/dist/
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.test.local
+frontend/.env.production.local
+frontend/npm-debug.log*
+frontend/yarn-debug.log*
+frontend/yarn-error.log*
+frontend/.DS_Store
+
+# IDE
 .vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# OS
+.DS_Store
+Thumbs.db
+
+# General
+*.log
+*.pot
+*.mo
+.cache/
+.pytest_cache/
+
+# custom
+*venv*
+backend/capstone-backend
+__pycache__/
+*.py[cod]
+venv/
+.env/
+*.db.backup
