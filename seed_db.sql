@@ -1,10 +1,10 @@
-INSERT OR IGNORE INTO dvd (
+INSERT OR IGNORE INTO dvds (
     title,
     director,
     genre,
     release_year,
     description,
-    rental_price,
+    rental_price_cents,
     total_copies,
     available_copies,
     is_active
@@ -15,7 +15,7 @@ VALUES (
     :genre,
     :release_year,
     :description,
-    :rental_price,
+    :rental_price_cents,
     :total_copies,
     :available_copies,
     :is_active

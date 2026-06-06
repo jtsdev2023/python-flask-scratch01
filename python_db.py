@@ -63,10 +63,10 @@ def seed_database():
             "genre": dvd["genre"],
             "release_year": dvd["release_year"],
             "description": dvd["description"],
-            "rental_price": dvd["rental_price"],
+            "rental_price_cents": round(dvd["rental_price"] * 100),
             "total_copies": dvd["total_copies"],
             "available_copies": dvd["available_copies"],
-            "is_active": dvd["is_active"],
+            "is_active": int(dvd["is_active"]),
         }
         for dvd in seed_data
     ]

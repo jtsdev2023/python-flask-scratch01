@@ -23,13 +23,13 @@ SELECT
     genre,
     release_year,
     description,
-    rental_price,
+    rental_price_cents,
     total_copies,
     available_copies,
     created_at,
     updated_at,
     is_active
-FROM dvd
+FROM dvds
 WHERE
     title LIKE :title_search
     AND (:genre IS NULL OR genre = :genre)
