@@ -12,12 +12,11 @@ SEED_PATH = BASE_DIR / "seed.json"
 
 
 def create_database():
-    if DB_PATH.exists():
-        print(f"Database already exists, skipping creation: {DB_PATH.resolve()}")
-        return
+    if not DB_PATH.exists():
+        raise FileNotFoundError(f"Database file not found: {DB_PATH.resolve()}")
 
     if not SCHEMA_PATH.exists():
-        raise FileNotFoundError(f"Schema file is not found: {SCHEMA_PATH}")
+        raise FileNotFoundError(f"Schema file not found: {SCHEMA_PATH.resolve()}")
 
     schema_sql = SCHEMA_PATH.read_text(encoding="utf-8")
     connection = None
@@ -39,9 +38,10 @@ def create_database():
 
 def query_dvds(title_search="%", genre=None, active_only=True):
     if not QUERY_PATH.exists():
-        raise FileNotFoundError(f"Query file is not found: {QUERY_PATH}")
+        raise FileNotFoundError(f"Query file not found: {QUERY_PATH.resolve()}")
 
     query_sql = QUERY_PATH.read_text(encoding="utf-8")
+    connection = None
 
     with sqlite3.connect(DB_PATH) as connection:
         connection.row_factory = sqlite3.Row
@@ -59,9 +59,10 @@ def query_dvds(title_search="%", genre=None, active_only=True):
 
 def seed_database():
     if not SEED_PATH.exists():
-        raise FileNotFoundError(f"Seed file not found: {SEED_PATH}")
+        raise FileNotFoundError(f"Seed file not found: {SEED_PATH.resolve()}")
 
     seed_data = json.loads(SEED_PATH.read_text(encoding="utf-8"))
+    connection = None
 
     try:
         connection = sqlite3.connect(DB_PATH)
@@ -85,14 +86,14 @@ def seed_database():
                 },
             )
 
-            connection.commit()
-            print(f"Database seeded successfully from: {SEED_PATH.resolve()}")
+        connection.commit()
+        print(f"Database seeded successfully from: {SEED_PATH.resolve()}")
 
     except sqlite3.IntegrityError as error:
         if connection is not None:
             connection.rollback()
         raise RuntimeError(
-            f"Database seed failed. A record primary key may already exist: {error}") from error
+            f"Database seed failed: {error}") from error
 
     except sqlite3.Error as error:
         if connection is not None:

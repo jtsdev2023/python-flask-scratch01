@@ -11,7 +11,9 @@ CREATE TABLE IF NOT EXISTS dvd (
     available_copies INTEGER NOT NULL DEFAULT 0,
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    is_active BOOLEAN NOT NULL DEFAULT FALSE CHECK (is_active IN (0,1))
+    is_active BOOLEAN NOT NULL DEFAULT FALSE CHECK (is_active IN (0,1)),
+
+    CONSTRAINT unique_dvd_title_director_year UNIQUE(title, director, release_year)
 );
 
 CREATE INDEX IF NOT EXISTS idx_dvd_title
