@@ -2,6 +2,7 @@
 
 import json
 import sqlite3
+from contextlib import closing
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -17,21 +18,14 @@ def create_database():
         raise FileNotFoundError(f"Schema file not found: {SCHEMA_PATH.resolve()}")
 
     schema_sql = SCHEMA_PATH.read_text(encoding="utf-8")
-    connection = None
 
     try:
-        connection = sqlite3.connect(DB_PATH)
-        cursor = connection.cursor()
-        cursor.executescript(schema_sql)
-        connection.commit()
+        with closing(sqlite3.connect(DB_PATH)) as connection:
+            connection.executescript(schema_sql)
+            connection.commit()
         print(f"Database created successfully: {DB_PATH.resolve()}")
     except sqlite3.Error as error:
-        if connection is not None:
-            connection.rollback()
         raise RuntimeError(f"SQLite error: {error}") from error
-    finally:
-        if connection is not None:
-            connection.close()
 
 
 def query_dvds(title_search="%", genre=None, active_only=True):
@@ -40,7 +34,7 @@ def query_dvds(title_search="%", genre=None, active_only=True):
 
     query_sql = QUERY_PATH.read_text(encoding="utf-8")
 
-    with sqlite3.connect(DB_PATH) as connection:
+    with closing(sqlite3.connect(DB_PATH)) as connection:
         connection.row_factory = sqlite3.Row
         cursor = connection.cursor()
         cursor.execute(
@@ -76,28 +70,21 @@ def seed_database():
         }
         for dvd in seed_data
     ]
-    connection = None
 
     try:
-        connection = sqlite3.connect(DB_PATH)
-        cursor = connection.cursor()
-        cursor.executemany(seed_sql, seed_params)
-        connection.commit()
+        with closing(sqlite3.connect(DB_PATH)) as connection:
+            cursor = connection.cursor()
+            cursor.executemany(seed_sql, seed_params)
+            inserted = cursor.rowcount
+            connection.commit()
         print(
             f"Seed process completed from: {SEED_PATH.resolve()} "
-            f"({connection.total_changes} rows inserted)"
+            f"({inserted} rows inserted)"
         )
     except sqlite3.IntegrityError as error:
-        if connection is not None:
-            connection.rollback()
         raise RuntimeError(f"Database seed failed: {error}") from error
     except sqlite3.Error as error:
-        if connection is not None:
-            connection.rollback()
         raise RuntimeError(f"SQLite error while seeding database: {error}") from error
-    finally:
-        if connection is not None:
-            connection.close()
 
 
 if __name__ == "__main__":
