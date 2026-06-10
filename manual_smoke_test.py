@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 import sys
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -9,6 +10,11 @@ from uuid import uuid4
 
 import db
 import python_db
+
+
+BASE_DIR = Path(__file__).resolve().parent
+user_payload_json = BASE_DIR / "smoke-test-user-payload.json"
+
 
 
 def expect_status(response, expected_status: int, label: str):
@@ -33,24 +39,30 @@ def main() -> int:
 
         client = create_app().test_client()
 
-        unique_email = f"manual.test+{uuid4().hex[:8]}@example.com"
-        user_payload = {
-            "email": unique_email,
-            "password": "StrongPass123!",
-            "first_name": "Manual",
-            "last_name": "Tester",
-            "phone_number": "5551234567",
-            "billing_address_line1": "123 Main St",
-            "billing_city": "Testville",
-            "billing_state": "CA",
-            "billing_postal_code": "90001",
-            "payment_method": {
-                "card_number": "4111111111111111",
-                "card_brand": "Visa",
-                "card_exp_month": 12,
-                "card_exp_year": 2030,
-            },
-        }
+        # unique_email = f"manual.test+{uuid4().hex[:8]}@example.com"
+        # user_payload = {
+        #     "email": unique_email,
+        #     "password": "StrongPass123!",
+        #     "first_name": "Sheldon",
+        #     "last_name": "Cooper",
+        #     "phone_number": "5551234567",
+        #     "billing_address_line1": "2311 North Los Robles Avenue",
+        #     "billing_address_line2": "Apartment 4A",
+        #     "billing_city": "Pasadena",
+        #     "billing_state": "CA",
+        #     "billing_postal_code": "91104",
+        #     "payment_method": {
+        #         "card_number": "0123456789012345",
+        #         "card_brand": "Visa",
+        #         "card_exp_month": 12,
+        #         "card_exp_year": 2030,
+        #     },
+        # }
+
+        unique_email = f"manual.test.{uuid4().hex[:8]}@example.com"
+        # read and load user payload from file
+        user_payload = json.loads(user_payload_json.read_text(encoding="utf-8"))
+        user_payload['email'] = unique_email
 
         health = client.get("/api/health")
         expect_status(health, 200, "GET /api/health")

@@ -1,0 +1,18 @@
+{
+    "email": "",
+    "password": "StrongPass123!",
+    "first_name": "Sheldon",
+    "last_name": "Cooper",
+    "phone_number": "5551234567",
+    "billing_address_line1": "2311 North Los Robles Avenue",
+    "billing_address_line2": "Apartment 4A",
+    "billing_city": "Pasadena",
+    "billing_state": "CA",
+    "billing_postal_code": "91104",
+    "payment_method": {
+        "card_number": "0123456789012345",
+        "card_brand": "Visa",
+        "card_exp_month": 12,
+        "card_exp_year": 2030
+    }
+}
