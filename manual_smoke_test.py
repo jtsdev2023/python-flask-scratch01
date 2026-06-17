@@ -194,13 +194,30 @@ def main() -> int:
         test_cursor = test_connection.cursor()
         test_cursor.execute(tmp_user_query)
         test_rows = test_cursor.fetchall()
-        print()
-        for test_row in test_rows:
-            print(test_row)
         test_connection.close()
-        print()
+        print("\nPRINT TEST USER INFO\n")
 
-        print("Manual smoke test completed successfully.")
+        if not test_rows:
+            print("No matching users found.")
+        else:
+            r = test_rows[0]
+            address_line_2 = f" {r[5]}" if r[5] else ""
+            user_info_rows = [
+                ("Email:", r[0]),
+                ("First Name:", r[1]),
+                ("Last Name:", r[2]),
+                ("Phone:", r[3]),
+                ("Address:", f"{r[4]}{address_line_2}"),
+                ("", f"{r[6]}, {r[7]} {r[8]}"),
+            ]
+            label_width = max(len(label) for label, _ in user_info_rows) + 2
+            user_info_lines = [
+                f"{label:<{label_width}}{value}"
+                for label, value in user_info_rows
+            ]
+            print("\n".join(user_info_lines))
+
+        print("\nManual smoke test completed successfully.\n")
         return 0
 
 
