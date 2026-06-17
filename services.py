@@ -23,6 +23,10 @@ class ValidationError(ServiceError):
     pass
 
 
+class AuthenticationError(ServiceError):
+    pass
+
+
 class NotFoundError(ServiceError):
     pass
 
@@ -123,6 +127,99 @@ def _ensure_dvd(dvd_id: int):
     if dvd is None:
         raise NotFoundError("DVD not found.")
     return dvd
+
+
+def _ensure_cart_owner(cart, current_user_id: int | None):
+    if current_user_id is not None and cart["user_id"] != current_user_id:
+        raise NotFoundError("Cart not found.")
+
+
+def _get_payment_method_summary(user_id: int) -> dict | None:
+    payment_method = fetch_one(
+        """
+        SELECT
+            id,
+            card_brand,
+            card_last4,
+            card_exp_month,
+            card_exp_year,
+            is_default
+        FROM payment_methods
+        WHERE user_id = :user_id
+        ORDER BY is_default DESC, id ASC
+        LIMIT 1
+        """,
+        {"user_id": user_id},
+    )
+    if payment_method is None:
+        return None
+    return {
+        "id": payment_method["id"],
+        "card_brand": payment_method["card_brand"],
+        "card_last4": payment_method["card_last4"],
+        "card_exp_month": payment_method["card_exp_month"],
+        "card_exp_year": payment_method["card_exp_year"],
+        "is_default": bool(payment_method["is_default"]),
+    }
+
+
+def _user_summary(user) -> dict:
+    return {
+        "id": user["id"],
+        "email": user["email"],
+        "first_name": user["first_name"],
+        "last_name": user["last_name"],
+        "phone_number": user["phone_number"],
+    }
+
+
+def _profile_payload(user) -> dict:
+    cart_details = get_or_create_active_cart(user["id"])
+    return {
+        "user": _user_summary(user),
+        "payment_method": _get_payment_method_summary(user["id"]),
+        "cart": {
+            "id": cart_details["cart"]["id"],
+            "status": cart_details["cart"]["status"],
+        },
+    }
+
+
+def authenticate_user(email: str, password: str) -> dict:
+    normalized_email = _normalize_email(email)
+    user = fetch_one("SELECT * FROM users WHERE email = :email", {"email": normalized_email})
+    if user is None or not user["is_active"]:
+        raise ValidationError("Invalid email or password.")
+    if not verify_password(password, user["password_hash"]):
+        raise ValidationError("Invalid email or password.")
+    return _profile_payload(user)
+
+
+def get_user_profile(user_id: int) -> dict:
+    user = _ensure_user_exists(user_id)
+    return _profile_payload(user)
+
+
+def get_or_create_active_cart(user_id: int) -> dict:
+    _ensure_user_exists(user_id)
+    active_cart = fetch_one(
+        """
+        SELECT id
+        FROM shopping_carts
+        WHERE user_id = :user_id
+          AND status = 'active'
+        ORDER BY id DESC
+        LIMIT 1
+        """,
+        {"user_id": user_id},
+    )
+    if active_cart is None:
+        cart_id, _ = execute(
+            "INSERT INTO shopping_carts (user_id, status) VALUES (:user_id, 'active')",
+            {"user_id": user_id},
+        )
+        return get_cart(cart_id, current_user_id=user_id)
+    return get_cart(active_cart["id"], current_user_id=user_id)
 
 
 def create_user(payload: dict) -> dict:
@@ -348,8 +445,9 @@ def list_dvds(title_search: str = "%", genre: str | None = None, active_only: bo
     ]
 
 
-def get_cart(cart_id: int) -> dict:
+def get_cart(cart_id: int, current_user_id: int | None = None) -> dict:
     cart = _ensure_cart(cart_id)
+    _ensure_cart_owner(cart, current_user_id)
     user = _ensure_user_exists(cart["user_id"])
     rows = fetch_all(
         """
@@ -420,11 +518,17 @@ def get_cart(cart_id: int) -> dict:
     }
 
 
-def add_item_to_cart(cart_id: int, dvd_id: int, quantity: int = 1) -> dict:
+def add_item_to_cart(
+    cart_id: int,
+    dvd_id: int,
+    quantity: int = 1,
+    current_user_id: int | None = None,
+) -> dict:
     if quantity <= 0:
         raise ValidationError("Quantity must be greater than zero.")
 
     cart = _ensure_cart(cart_id)
+    _ensure_cart_owner(cart, current_user_id)
     if cart["status"] != "active":
         raise ConflictError("Only active carts can be modified.")
 
@@ -476,11 +580,12 @@ def add_item_to_cart(cart_id: int, dvd_id: int, quantity: int = 1) -> dict:
                 {"quantity": total_quantity, "item_id": existing_item["id"]},
             )
 
-    return get_cart(cart_id)
+    return get_cart(cart_id, current_user_id=current_user_id)
 
 
-def remove_item_from_cart(cart_id: int, item_id: int) -> dict:
+def remove_item_from_cart(cart_id: int, item_id: int, current_user_id: int | None = None) -> dict:
     cart = _ensure_cart(cart_id)
+    _ensure_cart_owner(cart, current_user_id)
     if cart["status"] != "active":
         raise ConflictError("Only active carts can be modified.")
 
@@ -492,24 +597,26 @@ def remove_item_from_cart(cart_id: int, item_id: int) -> dict:
         raise NotFoundError("Cart item not found.")
 
     execute("DELETE FROM shopping_cart_items WHERE id = :item_id", {"item_id": item_id})
-    return get_cart(cart_id)
+    return get_cart(cart_id, current_user_id=current_user_id)
 
 
-def checkout_cart(cart_id: int, payment_method_id: int) -> dict:
+def checkout_cart(cart_id: int, payment_method_id: int, current_user_id: int | None = None) -> dict:
     cart = _ensure_cart(cart_id)
+    _ensure_cart_owner(cart, current_user_id)
     if cart["status"] != "active":
         raise ConflictError("This cart has already been checked out or closed.")
 
     payment_method = _ensure_payment_method(payment_method_id)
+    if current_user_id is not None and payment_method["user_id"] != current_user_id:
+        raise NotFoundError("Payment method not found.")
     if payment_method["user_id"] != cart["user_id"]:
         raise ConflictError("Payment method does not belong to this cart owner.")
 
-    cart_details = get_cart(cart_id)
+    cart_details = get_cart(cart_id, current_user_id=current_user_id)
     if not cart_details["items"]:
         raise ConflictError("Cannot checkout an empty cart.")
 
     with get_connection() as connection:
-        dvd_state = {}
         for item in cart_details["items"]:
             row = connection.execute(
                 "SELECT id, available_copies FROM dvds WHERE id = :dvd_id",
@@ -519,7 +626,6 @@ def checkout_cart(cart_id: int, payment_method_id: int) -> dict:
                 raise NotFoundError("A DVD in the cart no longer exists.")
             if row["available_copies"] < item["quantity"]:
                 raise ConflictError(f"Not enough copies available for {item['title']}.")
-            dvd_state[item["dvd_id"]] = row["available_copies"]
 
         subtotal_cents = cart_details["summary"]["subtotal_cents"]
         tax_cents = cart_details["summary"]["tax_cents"]
@@ -601,6 +707,12 @@ def checkout_cart(cart_id: int, payment_method_id: int) -> dict:
             {"cart_id": cart_id},
         )
 
+        next_cart_cursor = connection.execute(
+            "INSERT INTO shopping_carts (user_id, status) VALUES (:user_id, 'active')",
+            {"user_id": cart["user_id"]},
+        )
+        next_cart_id = next_cart_cursor.lastrowid
+
     return {
         "order_id": order_id,
         "cart_id": cart_id,
@@ -613,4 +725,70 @@ def checkout_cart(cart_id: int, payment_method_id: int) -> dict:
         "tax": _cents_to_decimal(tax_cents),
         "total": _cents_to_decimal(total_cents),
         "status": "placed",
+        "next_cart_id": next_cart_id,
+    }
+
+
+def get_order_details(order_id: int, current_user_id: int) -> dict:
+    order = fetch_one(
+        """
+        SELECT
+            id,
+            user_id,
+            payment_method_id,
+            order_date,
+            subtotal_cents,
+            tax_cents,
+            total_cents,
+            status
+        FROM orders
+        WHERE id = :order_id
+          AND user_id = :user_id
+        """,
+        {"order_id": order_id, "user_id": current_user_id},
+    )
+    if order is None:
+        raise NotFoundError("Order not found.")
+
+    rows = fetch_all(
+        """
+        SELECT
+            oi.dvd_id,
+            oi.quantity,
+            oi.unit_price_cents,
+            oi.total_price_cents,
+            d.title
+        FROM order_items oi
+        JOIN dvds d ON d.id = oi.dvd_id
+        WHERE oi.order_id = :order_id
+        ORDER BY oi.id ASC
+        """,
+        {"order_id": order_id},
+    )
+    return {
+        "order": {
+            "id": order["id"],
+            "user_id": order["user_id"],
+            "payment_method_id": order["payment_method_id"],
+            "order_date": order["order_date"],
+            "status": order["status"],
+            "subtotal_cents": order["subtotal_cents"],
+            "tax_cents": order["tax_cents"],
+            "total_cents": order["total_cents"],
+            "subtotal": _cents_to_decimal(order["subtotal_cents"]),
+            "tax": _cents_to_decimal(order["tax_cents"]),
+            "total": _cents_to_decimal(order["total_cents"]),
+        },
+        "items": [
+            {
+                "dvd_id": row["dvd_id"],
+                "title": row["title"],
+                "quantity": row["quantity"],
+                "unit_price_cents": row["unit_price_cents"],
+                "unit_price": _cents_to_decimal(row["unit_price_cents"]),
+                "total_price_cents": row["total_price_cents"],
+                "total_price": _cents_to_decimal(row["total_price_cents"]),
+            }
+            for row in rows
+        ],
     }
