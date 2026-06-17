@@ -195,7 +195,7 @@ def main() -> int:
         test_cursor.execute(tmp_user_query)
         test_rows = test_cursor.fetchall()
         test_connection.close()
-        print("\nPRINT TEST USER INFO\n")
+        print("\nPRINT TEST USER INFO:")
 
         if not test_rows:
             print("No matching users found.")
