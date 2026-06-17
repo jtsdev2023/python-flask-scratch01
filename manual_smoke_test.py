@@ -8,12 +8,16 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from uuid import uuid4
 
+# test
+import sqlite3
+
 import db
 import python_db
 
 
 BASE_DIR = Path(__file__).resolve().parent
-user_payload_json = BASE_DIR / "smoke-test-user-payload.json"
+
+user_payload_json_file_name = BASE_DIR / "smoke-test-user-payload.json"
 
 
 
@@ -22,6 +26,12 @@ def expect_status(response, expected_status: int, label: str):
         raise AssertionError(
             f"{label} returned {response.status_code}, expected {expected_status}: {response.get_json()}"
         )
+
+def generate_unique_email(first_name: str, last_name: str) -> str:
+    """Create unique user email for smoke test"""
+    unique_str = uuid4().hex[:6]
+    return f"{first_name}.{last_name}_{unique_str}@example.com"
+
 
 
 def main() -> int:
@@ -59,10 +69,27 @@ def main() -> int:
         #     },
         # }
 
-        unique_email = f"manual.test.{uuid4().hex[:8]}@example.com"
-        # read and load user payload from file
-        user_payload = json.loads(user_payload_json.read_text(encoding="utf-8"))
-        user_payload['email'] = unique_email
+        ##### need to wrap this is a loop for use with multiple users
+        # unique_email = f"manual.test.{uuid4().hex[:8]}@example.com"
+        # # read and load user payload from file
+        # user_payload = json.loads(user_payload_json_file_name.read_text(encoding="utf-8"))
+        # user_payload['email'] = unique_email
+
+        # user payload loop
+        # even a single user should be in a list obj
+        user_payload = json.loads(
+            user_payload_json_file_name.read_text(encoding="utf-8"))
+
+        for user in user_payload:
+            unique_email = \
+                generate_unique_email(user["first_name"], user["last_name"])
+            
+            # user payload seed file starts with email as empty string
+            # populate user email
+            user["email"] = unique_email
+
+        ######
+
 
         health = client.get("/api/health")
         expect_status(health, 200, "GET /api/health")
@@ -74,38 +101,46 @@ def main() -> int:
         if not dvd_items:
             raise AssertionError("GET /api/dvds returned no items.")
         print(f"PASS GET /api/dvds returned {len(dvd_items)} items")
+        # print a DVD item for example
+        print(f"\nPRINT DVD ITEM EXAMPLE:")
+        for k, v in dvd_items[0].items():
+            print(k, v)
+        print()
 
-        register = client.post("/api/register", json=user_payload)
-        expect_status(register, 201, "POST /api/register")
-        register_json = register.get_json()
-        cart_id = register_json["cart"]["id"]
-        payment_method_id = register_json["payment_method"]["id"]
-        print(
-            "PASS POST /api/register",
-            {
-                "user_id": register_json["user"]["id"],
-                "cart_id": cart_id,
-                "payment_method_id": payment_method_id,
-            },
-        )
+        #####   need to fix client registration now that test json is list[dict]
+        #       instead of just dict
+        for user in user_payload:
+            register = client.post("/api/register", json=user)
+            expect_status(register, 201, "POST /api/register")
+            register_json = register.get_json()
+            cart_id = register_json["cart"]["id"]
+            payment_method_id = register_json["payment_method"]["id"]
+            print(
+                "PASS POST /api/register",
+                {
+                    "user_id": register_json["user"]["id"],
+                    "cart_id": cart_id,
+                    "payment_method_id": payment_method_id,
+                },
+            )
 
-        duplicate_register = client.post("/api/register", json=user_payload)
-        expect_status(duplicate_register, 409, "POST /api/register duplicate")
-        print("PASS duplicate registration returns 409")
+            duplicate_register = client.post("/api/register", json=user)
+            expect_status(duplicate_register, 409, "POST /api/register duplicate")
+            print("PASS duplicate registration returns 409")
 
-        weak_password_payload = dict(user_payload)
-        weak_password_payload["email"] = f"weak+{uuid4().hex[:8]}@example.com"
-        weak_password_payload["password"] = "weak"
-        weak_password = client.post("/api/register", json=weak_password_payload)
-        expect_status(weak_password, 400, "POST /api/register weak password")
-        print("PASS weak password returns 400")
+            weak_password_payload = dict(user)
+            weak_password_payload["email"] = f"weak+{uuid4().hex[:8]}@example.com"
+            weak_password_payload["password"] = "weak"
+            weak_password = client.post("/api/register", json=weak_password_payload)
+            expect_status(weak_password, 400, "POST /api/register weak password")
+            print("PASS weak password returns 400")
 
-        empty_checkout = client.post(
-            "/api/checkout",
-            json={"cart_id": cart_id, "payment_method_id": payment_method_id},
-        )
-        expect_status(empty_checkout, 409, "POST /api/checkout empty cart")
-        print("PASS empty cart checkout returns 409")
+            empty_checkout = client.post(
+                "/api/checkout",
+                json={"cart_id": cart_id, "payment_method_id": payment_method_id},
+            )
+            expect_status(empty_checkout, 409, "POST /api/checkout empty cart")
+            print("PASS empty cart checkout returns 409")
 
         dvd_id = dvd_items[0]["id"]
         add_item = client.post(
@@ -139,6 +174,31 @@ def main() -> int:
             f"DELETE /api/carts/{cart_id}/items/{item_id} after checkout",
         )
         print("PASS post-checkout cart modification returns 409")
+
+        # test getting specific user
+        tmp_user_query = """
+        SELECT
+            email,
+            first_name,
+            last_name,
+            phone_number,
+            billing_address_line1,
+            billing_address_line2,
+            billing_city,
+            billing_state,
+            billing_postal_code
+        FROM users
+        WHERE last_name LIKE 'hofstadter'
+        """
+        test_connection = sqlite3.connect(temp_db_path)
+        test_cursor = test_connection.cursor()
+        test_cursor.execute(tmp_user_query)
+        test_rows = test_cursor.fetchall()
+        print()
+        for test_row in test_rows:
+            print(test_row)
+        test_connection.close()
+        print()
 
         print("Manual smoke test completed successfully.")
         return 0
