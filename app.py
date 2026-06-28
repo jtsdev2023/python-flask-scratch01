@@ -1,6 +1,6 @@
 import os
 
-from flask import Flask, jsonify, request, session
+from flask import Flask, jsonify, redirect, render_template, request, session, url_for
 
 from services import (
     AuthenticationError,
@@ -36,6 +36,16 @@ def create_app():
             raise AuthenticationError("Authentication required.")
         return int(user_id)
 
+    def _require_page_user_id():
+        user_id = session.get("user_id")
+        if user_id is None:
+            return redirect(url_for("login_page"))
+        return int(user_id)
+
+    @app.context_processor
+    def inject_template_globals():
+        return {"is_authenticated": session.get("user_id") is not None}
+
     @app.errorhandler(ServiceError)
     def handle_service_error(error):
         if isinstance(error, AuthenticationError):
@@ -49,6 +59,48 @@ def create_app():
         else:
             status_code = 500
         return jsonify({"error": str(error)}), status_code
+
+    @app.get("/")
+    def root_redirect():
+        return redirect(url_for("home_page"))
+    
+    @app.get("/home")
+    def home_page():
+        return render_template("index.html", page_title="Home", page_name="home")
+
+    @app.get("/login")
+    def login_page():
+        return render_template("login.html", page_title="Login", page_name="login")
+
+    @app.get("/register")
+    def register_page():
+        return render_template("register.html", page_title="Register", page_name="register")
+
+    @app.get("/catalog")
+    def catalog_page():
+        page_user_id = _require_page_user_id()
+        if not isinstance(page_user_id, int):
+            return page_user_id
+        return render_template("catalog.html", page_title="Catalog", page_name="catalog")
+
+    @app.get("/cart")
+    def cart_page():
+        page_user_id = _require_page_user_id()
+        if not isinstance(page_user_id, int):
+            return page_user_id
+        return render_template("cart.html", page_title="Your Cart", page_name="cart")
+
+    @app.get("/orders/<int:order_id>")
+    def order_page(order_id: int):
+        page_user_id = _require_page_user_id()
+        if not isinstance(page_user_id, int):
+            return page_user_id
+        return render_template(
+            "order_detail.html",
+            page_title=f"Order #{order_id}",
+            page_name="order",
+            order_id=order_id,
+        )
 
     @app.get("/api/health")
     def health_check():

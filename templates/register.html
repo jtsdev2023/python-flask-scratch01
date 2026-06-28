@@ -1,0 +1,105 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-xl-9">
+        <section class="surface-card p-4 p-lg-5 registration-form">
+            <div class="d-flex flex-column flex-lg-row justify-content-between gap-4 mb-4">
+                <div>
+                    <!-- <span class="eyebrow text-dark">New account</span> -->
+                    <span class="eyebrow new-account">New account</span>
+                    <h1 class="h2 mt-2 mb-2">Create your DVD rental account</h1>
+                    <!-- debug text -->
+                    <!-- <p class="text-secondary mb-0">Account registration flow - backend API payload: billing and payment setup.</p> -->
+                </div>
+                <div class="password-guide">
+                    <h2 class="h6 mb-2 password-rules">Password rules</h2>
+                    <ul class="small text-secondary mb-0">
+                        <li>At least 12 characters</li>
+                        <li>One uppercase letter</li>
+                        <li>One lowercase letter</li>
+                        <li>One number</li>
+                        <li>One special character</li>
+                    </ul>
+                </div>
+            </div>
+
+            <div id="form-alert" class="alert d-none" role="alert"></div>
+
+            <form id="register-form" novalidate>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label" for="first_name">First name</label>
+                        <input class="form-control" id="first_name" name="first_name" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="last_name">Last name</label>
+                        <input class="form-control" id="last_name" name="last_name" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="email">Email address</label>
+                        <input class="form-control" id="email" name="email" type="email" autocomplete="email" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="phone_number">Phone number</label>
+                        <input class="form-control" id="phone_number" name="phone_number" autocomplete="tel" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="password">Password</label>
+                        <input class="form-control" id="password" name="password" type="password" autocomplete="new-password" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="billing_address_line1">Billing address line 1</label>
+                        <input class="form-control" id="billing_address_line1" name="billing_address_line1" required>
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="billing_address_line2">Billing address line 2</label>
+                        <input class="form-control" id="billing_address_line2" name="billing_address_line2">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label" for="billing_city">Billing city</label>
+                        <input class="form-control" id="billing_city" name="billing_city" required>
+                    </div>
+                    <div class="col-md-4">
+                        <label class="form-label" for="billing_state">Billing state</label>
+                        <input class="form-control" id="billing_state" name="billing_state" required>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label" for="billing_postal_code">Zip code</label>
+                        <input class="form-control" id="billing_postal_code" name="billing_postal_code" required>
+                    </div>
+                </div>
+
+                <hr class="my-4">
+
+                <h2 class="h5 mb-3 payment-method">Simulated payment method</h2>
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        <label class="form-label" for="card_number">Card number</label>
+                        <input class="form-control" id="card_number" name="card_number" inputmode="numeric" placeholder="xxxx-xxxx-xxxx-xxxx" required>
+                    </div>
+                    <!-- <div class="col-md-3">
+                        <label class="form-label" for="card_brand">Card brand</label>
+                        <input class="form-control" id="card_brand" name="card_brand" placeholder="Visa" required>
+                    </div> -->
+                    <div class="col-md-2">
+                        <label class="form-label" for="card_exp_month">Month</label>
+                        <input class="form-control" id="card_exp_month" name="card_exp_month" type="number" min="1" max="12" placeholder="mm" required>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label" for="card_exp_year">Year</label>
+                        <input class="form-control" id="card_exp_year" name="card_exp_year" type="number" min="2000" placeholder="yyyy" required>
+                    </div>
+                </div>
+
+                <div class="mt-4 d-flex flex-column flex-md-row gap-3 align-items-md-center">
+                    <!-- <button class="btn btn-dark btn-lg" type="submit" data-submit-button>Create account</button> -->
+                    <!-- use btn-warning. create account button match register button color -->
+                    <button class="btn btn-warning btn-lg" type="submit" data-submit-button>Create account</button>
+                    <span class="text-secondary small">Registration signs the user in immediately and creates an active cart automatically.</span>
+                </div>
+            </form>
+        </section>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,241 @@
+:root {
+    --ink: #132238;
+    --navy: #183a5a;
+    --slate: #5a6a7d;
+    --paper: #f6f2e9;
+    --cream: #fffaf0;
+    --gold: #d7a84b;
+    --card-shadow: 0 20px 45px rgba(19, 34, 56, 0.12);
+}
+
+body {
+    min-height: 100vh;
+    font-family: "Source Sans 3", sans-serif;
+    /* font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; */
+    color: var(--ink);
+    background:
+        radial-gradient(circle at top left, rgba(215, 168, 75, 0.18), transparent 30%),
+        linear-gradient(180deg, #f4efe5 0%, #fffdf8 45%, #f0ece4 100%);
+}
+
+.jeremy-flix {
+    /* color: red; */
+    color: darkorange;
+    /* color: darkred; */
+    font-weight: 600
+}
+
+h1, h2, h3, h4, h5, .brand-mark {
+    /* font-family: "Fraunces", sans-serif; */
+    /* want sans-serif style font */
+    font-family:'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* want to change color of "MVP includes" UL h4 hero-panel text */
+.mvp {
+    /* color: rgba(33, 74, 112, 0.9); */
+    /* color: #8a5b11; */
+    /* color: darkorange; */
+    color: lightblue;
+    font-weight: 600;
+}
+
+.page-shell {
+    min-height: 100vh;
+}
+
+.site-nav {
+    background: linear-gradient(135deg, rgba(15, 37, 59, 0.95), rgba(32, 66, 100, 0.95));
+    box-shadow: 0 8px 30px rgba(10, 24, 39, 0.16);
+}
+
+.brand-mark {
+    letter-spacing: 0.01em;
+    /* make match body jeremy flix color */
+    color: darkorange;
+}
+
+.page-main {
+    padding-bottom: 4rem;
+}
+
+.eyebrow {
+    display: inline-block;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+    font-size: 0.76rem;
+    font-weight: 700;
+    color: #8a5b11;
+}
+
+.hero-panel,
+.surface-card,
+.feature-card,
+.info-card {
+    /* background: rgba(255, 251, 244, 0.92); */
+    background: rgba(24, 58, 90, 0.97);
+    border: 1px solid rgba(24, 58, 90, 0.08);
+    box-shadow: var(--card-shadow);
+    /* font-family:Verdana, Geneva, Tahoma, sans-serif */
+    color: white;
+}
+
+.hero-panel {
+    background:
+        linear-gradient(135deg, rgba(24, 58, 90, 0.97), rgba(33, 74, 112, 0.9)),
+        linear-gradient(180deg, rgba(215, 168, 75, 0.4), transparent);
+    color: #fff;
+    /* font-family:Verdana, Geneva, Tahoma, sans-serif */
+}
+
+.hero-panel .eyebrow {
+    color: #f3d18b;
+}
+
+.hero-panel .lead {
+    max-width: 42rem;
+}
+
+.feature-card,
+.info-card,
+.surface-card {
+    border-radius: 1.25rem;
+}
+
+.feature-card,
+.info-card {
+    padding: 1.5rem;
+}
+
+.feature-list {
+    padding-left: 1.1rem;
+    color: white;
+}
+
+.feature-list li + li {
+    margin-top: 0.75rem;
+}
+
+.password-guide {
+    min-width: 16rem;
+    background: rgba(24, 58, 90, 0.05);
+    border-radius: 1rem;
+    padding: 1rem 1.1rem;
+}
+
+.catalog-card {
+    background: rgba(255, 255, 255, 0.88);
+    border: 1px solid rgba(24, 58, 90, 0.08);
+    border-radius: 1.25rem;
+    box-shadow: 0 16px 30px rgba(19, 34, 56, 0.08);
+    height: 100%;
+}
+
+.catalog-card .card-body {
+    display: flex;
+    flex-direction: column;
+}
+
+.catalog-meta {
+    color: var(--slate);
+    font-size: 0.95rem;
+}
+
+.price-pill,
+.status-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    border-radius: 999px;
+    padding: 0.45rem 0.8rem;
+    font-weight: 700;
+}
+
+.price-pill {
+    background: rgba(215, 168, 75, 0.18);
+    color: #7d5613;
+}
+
+.status-pill {
+    background: rgba(24, 58, 90, 0.1);
+    color: var(--navy);
+}
+
+.summary-list {
+    display: grid;
+    grid-template-columns: 1fr auto;
+    row-gap: 0.9rem;
+    column-gap: 1rem;
+}
+
+.summary-list dt,
+.summary-list dd {
+    margin: 0;
+}
+
+.summary-list dd {
+    font-weight: 700;
+}
+
+.cart-item,
+.order-item {
+    border: 1px solid rgba(24, 58, 90, 0.08);
+    border-radius: 1rem;
+    padding: 1rem 1.1rem;
+    background: rgba(255, 255, 255, 0.74);
+}
+
+.sticky-summary {
+    position: sticky;
+    top: 1.25rem;
+}
+
+.order-hero {
+    background: linear-gradient(135deg, rgba(255, 250, 240, 0.96), rgba(244, 234, 208, 0.96));
+}
+
+.form-control:focus,
+.form-select:focus,
+.btn:focus {
+    box-shadow: 0 0 0 0.25rem rgba(215, 168, 75, 0.22);
+    border-color: rgba(215, 168, 75, 0.8);
+}
+
+.text-light-emphasis {
+    color: rgba(255, 255, 255, 0.82) !important;
+}
+
+/* login tab */
+/* account access */
+.span-login-account-access {
+    color: darkorange;
+}
+
+/* login text */
+.ht, .mt-2.mb-3 {
+    color: white;
+}
+
+/* email and password text */
+.login-form {
+    color: white;
+}
+
+/* register tab */
+.registration-form {
+    color: white;
+}
+
+.password-rules, .new-account, .payment-method {
+    color: darkorange;
+}
+
+/* .btn-create-account {
+    background
+} */
+
+@media (max-width: 991.98px) {
+    .sticky-summary {
+        position: static;
+    }
+}

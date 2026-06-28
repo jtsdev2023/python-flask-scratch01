@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-end gap-3 mb-4">
+    <div>
+        <span class="eyebrow text-dark">Current cart</span>
+        <h1 class="h2 mt-2 mb-2">Review your selections</h1>
+        <p class="text-secondary mb-0">Remove items, verify totals, and complete a simulated checkout using your default fictional payment method.</p>
+    </div>
+    <a class="btn btn-outline-dark" href="{{ url_for('catalog_page') }}">Back to catalog</a>
+</section>
+
+<div id="cart-feedback" class="alert d-none" role="alert"></div>
+<div class="row g-4">
+    <div class="col-lg-8">
+        <section class="surface-card p-4">
+            <div id="cart-loading" class="text-secondary">Loading cart...</div>
+            <div id="cart-empty" class="d-none text-center py-5">
+                <h2 class="h4 mb-2">Your cart is empty</h2>
+                <p class="text-secondary mb-3">Browse the catalog and add a DVD to get started.</p>
+                <a class="btn btn-dark" href="{{ url_for('catalog_page') }}">Browse catalog</a>
+            </div>
+            <div id="cart-items" class="d-none"></div>
+        </section>
+    </div>
+    <div class="col-lg-4">
+        <section class="surface-card p-4 sticky-summary">
+            <h2 class="h5 mb-3">Order summary</h2>
+            <dl id="cart-summary" class="summary-list mb-4"></dl>
+            <button class="btn btn-warning btn-lg w-100" type="button" id="checkout-button" disabled>Complete checkout</button>
+            <p class="text-secondary small mt-3 mb-0">Checkout uses the default payment method returned by your account profile.</p>
+        </section>
+    </div>
+</div>
+{% endblock %}

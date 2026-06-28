@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="surface-card p-4 p-lg-5 mb-4 order-hero">
+    <span class="eyebrow text-dark">Order confirmation</span>
+    <h1 class="h2 mt-2 mb-2">Simulated checkout was placed successfully.</h1>
+    <p class="text-secondary mb-0">Review order details below, then continue browsing with your newly created active cart.</p>
+</section>
+
+<div id="order-feedback" class="alert d-none" role="alert"></div>
+<div class="row g-4">
+    <div class="col-lg-8">
+        <section class="surface-card p-4">
+            <div id="order-loading" class="text-secondary">Loading order details...</div>
+            <div id="order-content" class="d-none">
+                <div class="d-flex flex-column flex-md-row justify-content-between gap-3 mb-4">
+                    <div>
+                        <h2 class="h4 mb-1" id="order-number">Order</h2>
+                        <p class="text-secondary mb-0" id="order-date"></p>
+                    </div>
+                    <div class="badge status-pill" id="order-status"></div>
+                </div>
+                <div id="order-items" class="vstack gap-3"></div>
+            </div>
+        </section>
+    </div>
+    <div class="col-lg-4">
+        <section class="surface-card p-4">
+            <h2 class="h5 mb-3">Totals</h2>
+            <dl id="order-summary" class="summary-list mb-4"></dl>
+            <div class="d-grid gap-2">
+                <a class="btn btn-dark" href="{{ url_for('catalog_page') }}">Return to catalog</a>
+                <a class="btn btn-outline-dark" href="{{ url_for('cart_page') }}">View active cart</a>
+            </div>
+        </section>
+    </div>
+</div>
+{% endblock %}

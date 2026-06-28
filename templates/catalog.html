@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="d-flex flex-column flex-lg-row justify-content-between align-items-lg-end gap-3 mb-4">
+    <div>
+        <span class="eyebrow text-dark">DVD catalog</span>
+        <h1 class="h2 mt-2 mb-2">Browse available titles</h1>
+        <p class="text-secondary mb-0">Search by title, filter by genre, and add movies to your active cart without leaving the page.</p>
+    </div>
+    <a class="btn btn-outline-dark" href="{{ url_for('cart_page') }}">View cart</a>
+</section>
+
+<section class="surface-card p-4 mb-4">
+    <form id="catalog-filter-form" class="row g-3 align-items-end">
+        <div class="col-lg-7">
+            <label class="form-label" for="title_search">Search by title</label>
+            <input class="form-control" id="title_search" name="title_search" placeholder="Try Forrest, Matrix, Alien...">
+        </div>
+        <div class="col-lg-3">
+            <label class="form-label" for="genre_filter">Genre</label>
+            <select class="form-select" id="genre_filter" name="genre">
+                <option value="">All genres</option>
+            </select>
+        </div>
+        <div class="col-lg-2 d-grid">
+            <button class="btn btn-dark" type="submit">Apply filters</button>
+        </div>
+    </form>
+</section>
+
+<div id="catalog-feedback" class="alert d-none" role="alert"></div>
+<div id="catalog-loading" class="text-secondary mb-3">Loading catalog...</div>
+<div id="catalog-grid" class="row g-4"></div>
+{% endblock %}

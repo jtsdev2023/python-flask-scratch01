@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+
+{% block content %}
+<section class="hero-panel rounded-4 p-4 p-lg-5 mb-4">
+    <div class="row align-items-center g-4">
+        <div class="col-lg-7">
+            <span class="eyebrow">CCO SDEV-435 2026</span>
+            <h1 class="jeremy-flix">Jeremy Flix DVD rental app.</h1>
+            <p class="lead text-light-emphasis mb-4">Create an account, browse DVD catalog, add titles to your cart, and complete checkout.</p>
+            <div class="d-flex flex-wrap gap-3">
+                {% if is_authenticated %}
+                    <a class="btn btn-warning btn-lg" href="{{ url_for('catalog_page') }}">Go to catalog</a>
+                    <a class="btn btn-outline-light btn-lg" href="{{ url_for('cart_page') }}">View cart</a>
+                {% else %}
+                    <a class="btn btn-warning btn-lg" href="{{ url_for('register_page') }}">Create account</a>
+                    <a class="btn btn-outline-light btn-lg" href="{{ url_for('login_page') }}">Login</a>
+                {% endif %}
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="feature-card h-100">
+                <h2 class="h4 mb-3 mvp">MVP includes</h2>
+                <!-- <h2 class="h4 mb-3">MVP includes</h2> -->
+                <!-- <h2 class="mvp h4 mb-3">MVP includes</h2> -->
+                <ul class="feature-list mb-0">
+                    <li>Secure account registration with simulated billing details</li>
+                    <li>DVD browsing with title and genre filters</li>
+                    <li>Cart management with live totals</li>
+                    <li>Simulated checkout and order confirmation</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="row g-4">
+    <div class="col-md-4">
+        <div class="info-card h-100">
+            <h2 class="h5">Temp info card 1</h2>
+            <p class="mb-0">Lorem ipsum 1.</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="info-card h-100">
+            <h2 class="h5">Temp info card 2</h2>
+            <p class="mb-0">Lorem ipsum 2.</p>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="info-card h-100">
+            <h2 class="h5">Temp info card 3</h2>
+            <p class="mb-0">Lorem ipsum 3.</p>
+        </div>
+    </div>
+</section>
+{% endblock %}
