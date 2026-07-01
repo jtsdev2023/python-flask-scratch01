@@ -1,30 +1,8 @@
 from __future__ import annotations
 
 import re
-from uuid import uuid4
 
-
-
-def build_user_payload() -> dict:
-    unique = uuid4().hex[:6]
-    return {
-        "email": f"sheldon.cooper_{unique}@example.com",
-        "password": "StrongPass123!",
-        "first_name": "Sheldon",
-        "last_name": "Cooper",
-        "phone_number": "5551234567",
-        "billing_address_line1": "2311 North Los Robles Avenue",
-        "billing_address_line2": "Apartment 4A",
-        "billing_city": "Pasadena",
-        "billing_state": "CA",
-        "billing_postal_code": "91104",
-        "payment_method": {
-            "card_number": "0123456789012345",
-            "card_brand": "Visa",
-            "card_exp_month": 12,
-            "card_exp_year": 2030,
-        },
-    }
+from test_support import build_user_payload
 
 
 def fill_register_form(page, user_payload: dict):
@@ -84,14 +62,12 @@ def open_cart(page, live_server: str):
     page.locator("#cart-loading").wait_for(state="hidden")
 
 
-
 def test_register_page_creates_account_and_redirects_to_catalog(page, live_server):
     register_user_via_browser(page, live_server)
 
     assert page.locator("body").get_attribute("data-page") == "catalog"
     assert page.locator("[data-logout-button]").is_visible()
     assert "Catalog" in page.title()
-
 
 
 def test_login_page_signs_in_existing_user(page, live_server, flask_app):
@@ -102,7 +78,6 @@ def test_login_page_signs_in_existing_user(page, live_server, flask_app):
     assert page.locator("body").get_attribute("data-page") == "catalog"
     assert page.locator("[data-logout-button]").is_visible()
     assert "Catalog" in page.title()
-
 
 
 def test_logout_button_signs_user_out_and_returns_to_home(page, live_server):
@@ -116,7 +91,6 @@ def test_logout_button_signs_user_out_and_returns_to_home(page, live_server):
     assert page.locator("[data-logout-button]").count() == 0
 
 
-
 def test_cart_page_adds_and_removes_items(page, live_server):
     register_user_via_browser(page, live_server)
     item_title = add_first_catalog_item_to_cart(page)
@@ -127,12 +101,10 @@ def test_cart_page_adds_and_removes_items(page, live_server):
     assert page.locator("#checkout-button").is_enabled()
 
     page.locator("#cart-items article").first.get_by_role("button", name="Remove").click()
-    page.locator("#cart-feedback").get_by_text(
-        f"{item_title} was removed from your cart.").wait_for()
+    page.locator("#cart-feedback").get_by_text(f"{item_title} was removed from your cart.").wait_for()
 
     assert page.locator("#cart-empty").is_visible()
     assert page.locator("#checkout-button").is_disabled()
-
 
 
 def test_checkout_flow_places_order_and_returns_to_empty_active_cart(page, live_server):

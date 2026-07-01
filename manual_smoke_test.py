@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-import json
+import copy
 import sys
 from pathlib import Path
 from tempfile import TemporaryDirectory
@@ -10,10 +10,7 @@ from uuid import uuid4
 
 import db
 import python_db
-
-
-BASE_DIR = Path(__file__).resolve().parent
-USER_PAYLOAD_PATH = BASE_DIR / "smoke-test-user-payload.json"
+from test_support import load_user_payloads
 
 
 def expect_status(response, expected_status: int, label: str):
@@ -21,18 +18,6 @@ def expect_status(response, expected_status: int, label: str):
         raise AssertionError(
             f"{label} returned {response.status_code}, expected {expected_status}: {response.get_json()}"
         )
-
-
-def generate_unique_email(first_name: str, last_name: str) -> str:
-    unique_str = uuid4().hex[:6]
-    return f"{first_name}.{last_name}_{unique_str}@example.com"
-
-
-def load_user_payloads() -> list[dict]:
-    user_payloads = json.loads(USER_PAYLOAD_PATH.read_text(encoding="utf-8"))
-    for user in user_payloads:
-        user["email"] = generate_unique_email(user["first_name"], user["last_name"])
-    return user_payloads
 
 
 def main() -> int:
@@ -92,8 +77,7 @@ def main() -> int:
         expect_status(duplicate_register, 409, "POST /api/register duplicate")
         print("PASS duplicate registration returns 409")
 
-        weak_password_payload = dict(user_b)
-        weak_password_payload["payment_method"] = dict(user_b["payment_method"])
+        weak_password_payload = copy.deepcopy(user_b)
         weak_password_payload["email"] = f"weak+{uuid4().hex[:8]}@example.com"
         weak_password_payload["password"] = "weak"
         weak_password = anonymous_client.post("/api/register", json=weak_password_payload)
