@@ -260,6 +260,7 @@ def create_user(payload: dict) -> dict:
     if password_errors:
         raise ValidationError(" ".join(password_errors))
 
+    # card brand
     payment_required_fields = ["card_number", "card_brand", "card_exp_month", "card_exp_year"]
     missing_payment = [field for field in payment_required_fields if field not in payment_method]
     if missing_payment:

@@ -81,3 +81,5 @@ venv/
 .env/
 *.db
 *.db.backup
+*.db.backup*
+*py.backup*

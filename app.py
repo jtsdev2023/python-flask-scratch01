@@ -129,6 +129,7 @@ def create_app():
         session.clear()
         return jsonify({"message": "Logged out."})
 
+    # update to be "profile" instead of "me" -- @app.get("/api/profile")
     @app.get("/api/me")
     def current_user_profile():
         user_id = _require_session_user_id()
