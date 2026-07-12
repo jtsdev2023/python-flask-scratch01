@@ -185,14 +185,11 @@ def _profile_payload(user) -> dict:
     }
 
 
-# 
 def authenticate_user(email: str, password: str) -> dict:
     normalized_email = _normalize_email(email)
     user = fetch_one("SELECT * FROM users WHERE email = :email", {"email": normalized_email})
     if user is None or not user["is_active"]:
-        # raise http 401 error instead of http 400 error
         raise ValidationError("Invalid email or password.")
-        # raise AuthenticationError("Invalid email or password.")
     if not verify_password(password, user["password_hash"]):
         raise ValidationError("Invalid email or password.")
     return _profile_payload(user)

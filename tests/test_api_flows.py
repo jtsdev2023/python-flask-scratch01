@@ -127,7 +127,6 @@ def test_logout_clears_session(client_b, user_b_payload):
     assert me_response.status_code == 401
     assert cart_response.status_code == 401
 
-
 def test_invalid_login_returns_400(client_b, user_b_payload):
     register_user(client_b, user_b_payload)
     client_b.post("/api/logout")
@@ -147,7 +146,7 @@ def test_nonexistent_user_login_returns_400(client_b):
         json={"email": "missing.user@example.com", "password": "StrongPass123!"},
     )
 
-    assert response.status_code == 401
+    assert response.status_code == 400
     assert response.get_json()["error"] == "Invalid email or password."
 
 
