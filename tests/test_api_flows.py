@@ -141,6 +141,16 @@ def test_invalid_login_returns_400(client_b, user_b_payload):
     assert response.get_json()["error"] == "Invalid email or password."
 
 
+def test_nonexistent_user_login_returns_400(client_b):
+    response = client_b.post(
+        "/api/login",
+        json={"email": "missing.user@example.com", "password": "StrongPass123!"},
+    )
+
+    assert response.status_code == 401
+    assert response.get_json()["error"] == "Invalid email or password."
+
+
 def test_login_returns_profile_and_expected_active_cart(client_b, user_b_payload):
     register_data = register_user(client_b, user_b_payload)
     cart_b_id = register_data["cart"]["id"]

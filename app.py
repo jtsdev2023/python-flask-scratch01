@@ -2,6 +2,7 @@ import os
 
 from flask import Flask, jsonify, redirect, render_template, request, session, url_for
 
+from python_db import ensure_database_ready
 from services import (
     AuthenticationError,
     ConflictError,
@@ -22,6 +23,8 @@ from services import (
 
 
 def create_app():
+    ensure_database_ready()
+
     app = Flask(__name__)
     app.config.update(
         SECRET_KEY=os.environ.get("SECRET_KEY", "dev-secret-change-me"),
@@ -63,7 +66,7 @@ def create_app():
     @app.get("/")
     def root_redirect():
         return redirect(url_for("home_page"))
-    
+
     @app.get("/home")
     def home_page():
         return render_template("index.html", page_title="Home", page_name="home")

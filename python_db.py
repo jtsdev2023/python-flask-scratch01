@@ -87,6 +87,29 @@ def seed_database():
         raise RuntimeError(f"SQLite error while seeding database: {error}") from error
 
 
+# this was to fix SQL DB error found when testing app login w/ non-existent user.
+# got SQL DB error that no "users" table existed.
+# is this the right approach?
+# or was the problem just a testing problem b/c the DB won't be empty when actually
+# running the app.
+def ensure_database_ready():
+    with closing(sqlite3.connect(DB_PATH)) as connection:
+        users_table = connection.execute(
+            "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'users'"
+        ).fetchone()
+        dvds_table = connection.execute(
+            "SELECT name FROM sqlite_master WHERE type = 'table' AND name = 'dvds'"
+        ).fetchone()
+        dvd_count = None
+        if dvds_table is not None:
+            dvd_count = connection.execute("SELECT COUNT(*) FROM dvds").fetchone()[0]
+
+    if users_table is None:
+        create_database()
+    if dvds_table is None or dvd_count == 0:
+        seed_database()
+
+
 if __name__ == "__main__":
     create_database()
     seed_database()
