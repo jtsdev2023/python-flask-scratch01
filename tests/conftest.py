@@ -14,9 +14,8 @@ if str(PROJECT_ROOT) not in sys.path:
 import pytest
 from werkzeug.serving import make_server
 
-import db
-import python_db
 from app import create_app
+from db import get_engine
 
 playwright_sync_api = pytest.importorskip("playwright.sync_api")
 sync_playwright = playwright_sync_api.sync_playwright
@@ -47,18 +46,17 @@ class LiveServer:
 
 
 @pytest.fixture
-def flask_app(tmp_path, monkeypatch):
-    # Each test gets a fresh seeded SQLite database instead of using the repo's persistent DB file.
+def flask_app(tmp_path):
+    # Each test gets a fresh seeded SQLite database via the app factory config.
     temp_db_path = tmp_path / "playwright-tests.db"
-    monkeypatch.setattr(db, "DB_PATH", temp_db_path)
-    monkeypatch.setattr(python_db, "DB_PATH", temp_db_path)
-
-    python_db.create_database()
-    python_db.seed_database()
-
-    app = create_app()
-    app.config.update(TESTING=True)
-    return app
+    app = create_app(
+        {
+            "TESTING": True,
+            "DATABASE_URL": f"sqlite+pysqlite:///{temp_db_path}",
+        }
+    )
+    yield app
+    get_engine(app).dispose()
 
 
 @pytest.fixture

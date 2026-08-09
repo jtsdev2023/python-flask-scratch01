@@ -8,8 +8,8 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from uuid import uuid4
 
-import db
-import python_db
+from app import create_app
+from db import get_engine
 from test_support import load_user_payloads
 
 
@@ -23,16 +23,12 @@ def expect_status(response, expected_status: int, label: str):
 def main() -> int:
     with TemporaryDirectory(prefix="scratch01-manualtest-") as tmpdir:
         temp_db_path = Path(tmpdir) / "manual_smoke_test.db"
-
-        db.DB_PATH = temp_db_path
-        python_db.DB_PATH = temp_db_path
-
-        python_db.create_database()
-        python_db.seed_database()
-
-        from app import create_app
-
-        app = create_app()
+        app = create_app(
+            {
+                "TESTING": True,
+                "DATABASE_URL": f"sqlite+pysqlite:///{temp_db_path}",
+            }
+        )
         anonymous_client = app.test_client()
         client_a = app.test_client()
         client_b = app.test_client()
@@ -185,6 +181,7 @@ def main() -> int:
         print("PASS post-checkout cart modification returns 409")
 
         print("\nManual smoke test completed successfully.\n")
+        get_engine(app).dispose()
         return 0
 
 

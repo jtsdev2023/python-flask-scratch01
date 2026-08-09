@@ -2,6 +2,7 @@ import os
 
 from flask import Flask, jsonify, redirect, render_template, request, session, url_for
 
+from db import DEFAULT_DATABASE_URL, init_app
 from python_db import ensure_database_ready
 from services import (
     AuthenticationError,
@@ -22,16 +23,20 @@ from services import (
 )
 
 
-def create_app():
-    ensure_database_ready()
-
+def create_app(config: dict | None = None):
     app = Flask(__name__)
     app.config.update(
         SECRET_KEY=os.environ.get("SECRET_KEY", "dev-secret-change-me"),
         SESSION_COOKIE_HTTPONLY=True,
         SESSION_COOKIE_SAMESITE="Lax",
         SESSION_COOKIE_SECURE=False,
+        DATABASE_URL=os.environ.get("DATABASE_URL", DEFAULT_DATABASE_URL),
     )
+    if config:
+        app.config.update(config)
+
+    init_app(app)
+    ensure_database_ready(app)
 
     def _require_session_user_id() -> int:
         user_id = session.get("user_id")
@@ -132,7 +137,6 @@ def create_app():
         session.clear()
         return jsonify({"message": "Logged out."})
 
-    # update to be "profile" instead of "me" -- @app.get("/api/profile")
     @app.get("/api/me")
     def current_user_profile():
         user_id = _require_session_user_id()
@@ -188,8 +192,5 @@ def create_app():
     return app
 
 
-app = create_app()
-
-
 if __name__ == "__main__":
-    app.run(debug=True)
+    create_app().run(debug=True)
