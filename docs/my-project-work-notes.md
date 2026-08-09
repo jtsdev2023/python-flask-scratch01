@@ -98,7 +98,7 @@ The script seeds the temp DB, exercises the main Flask routes through `app.test_
 
 Run it with one command:
 ```bash
-./.pyscratch_venv/bin/python manual_smoke_test.py
+./.pyscratch_venv/bin/python scripts/manual_smoke_test.py
 ```
 
 ```python

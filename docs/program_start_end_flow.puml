@@ -1,0 +1,22 @@
+@startuml program_start_end_flow
+title DVD Rental App - Program Start and End Flow
+
+start
+:python app.py;
+:create_app configures Flask app;
+:init_app builds engine/session factory;
+:ensure_database_ready creates + seeds tables if empty;
+:Flask server listens for requests;
+
+repeat
+  :Incoming HTTP request;
+  :Route handler in app.py;
+  :services.py business logic;
+  :session_scope commits or rolls back;
+  :JSON or rendered HTML response;
+repeat while (Server process still running?) is (yes)
+->no;
+
+stop
+
+@enduml

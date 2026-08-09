@@ -10,8 +10,10 @@ from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session, sessionmaker
 
 
-BASE_DIR = Path(__file__).resolve().parent
-DEFAULT_DATABASE_URL = f"sqlite+pysqlite:///{BASE_DIR / 'dvdrental_test.db'}"
+PROJECT_ROOT = Path(__file__).resolve().parent.parent
+INSTANCE_DIR = PROJECT_ROOT / "instance"
+INSTANCE_DIR.mkdir(parents=True, exist_ok=True)
+DEFAULT_DATABASE_URL = f"sqlite+pysqlite:///{INSTANCE_DIR / 'dvdrental_test.db'}"
 DATABASE_EXTENSION_KEY = "database"
 
 

@@ -11,8 +11,8 @@ from uuid import uuid4
 from sqlalchemy import select
 from sqlalchemy.orm import Session, joinedload
 
-from db import session_scope
-from models import Dvd, Order, OrderItem, PasswordHistory, PaymentMethod, ShoppingCart, ShoppingCartItem, User
+from .db import session_scope
+from .models import Dvd, Order, OrderItem, PasswordHistory, PaymentMethod, ShoppingCart, ShoppingCartItem, User
 
 
 SALES_TAX_RATE = Decimal("0.07")

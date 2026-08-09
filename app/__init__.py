@@ -2,9 +2,9 @@ import os
 
 from flask import Flask, jsonify, redirect, render_template, request, session, url_for
 
-from db import DEFAULT_DATABASE_URL, init_app
-from python_db import ensure_database_ready
-from services import (
+from .db import DEFAULT_DATABASE_URL, init_app
+from .python_db import ensure_database_ready
+from .services import (
     AuthenticationError,
     ConflictError,
     NotFoundError,
@@ -192,5 +192,3 @@ def create_app(config: dict | None = None):
     return app
 
 
-if __name__ == "__main__":
-    create_app().run(debug=True)

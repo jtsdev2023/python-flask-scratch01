@@ -9,8 +9,8 @@ from flask import Flask
 from sqlalchemy import select
 from sqlalchemy.dialects.sqlite import insert as sqlite_insert
 
-from db import DEFAULT_DATABASE_URL, get_engine, init_app, session_scope
-from models import Base, Dvd
+from .db import DEFAULT_DATABASE_URL, get_engine, init_app, session_scope
+from .models import Base, Dvd
 
 
 BASE_DIR = Path(__file__).resolve().parent
@@ -78,6 +78,7 @@ def ensure_database_ready(app: Flask | None = None) -> None:
 
 
 if __name__ == "__main__":
+    # relative imports require invocation as `python -m app.python_db`
     scratch_app = Flask(__name__)
     scratch_app.config["DATABASE_URL"] = DEFAULT_DATABASE_URL
     init_app(scratch_app)

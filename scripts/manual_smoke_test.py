@@ -8,9 +8,13 @@ from pathlib import Path
 from tempfile import TemporaryDirectory
 from uuid import uuid4
 
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+if str(PROJECT_ROOT) not in sys.path:
+    sys.path.insert(0, str(PROJECT_ROOT))
+
 from app import create_app
-from db import get_engine
-from test_support import load_user_payloads
+from app.db import get_engine
+from tests.test_support import load_user_payloads
 
 
 def expect_status(response, expected_status: int, label: str):

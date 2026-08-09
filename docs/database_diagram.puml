@@ -1,0 +1,117 @@
+@startuml database_diagram
+!define pk(x) <b><color:#b8861b><&key></color> x</b>
+!define fk(x) <color:#666666><&link-intact></color> x
+title DVD Rental App - Database Entity Relationship Diagram
+
+entity "users" as users {
+  pk(id) : INTEGER
+  --
+  email : STRING <<unique>>
+  password_hash : STRING
+  first_name : STRING
+  last_name : STRING
+  phone_number : STRING
+  billing_address_line1 : STRING
+  billing_address_line2 : STRING
+  billing_city : STRING
+  billing_state : STRING
+  billing_postal_code : STRING
+  is_active : BOOLEAN
+  created_at : DATETIME
+  updated_at : DATETIME
+}
+
+entity "password_history" as password_history {
+  pk(id) : INTEGER
+  --
+  fk(user_id) : INTEGER
+  password_hash : STRING
+  created_at : DATETIME
+}
+
+entity "payment_methods" as payment_methods {
+  pk(id) : INTEGER
+  --
+  fk(user_id) : INTEGER
+  payment_token : STRING <<unique>>
+  card_brand : STRING
+  card_last4 : STRING
+  card_exp_month : INTEGER
+  card_exp_year : INTEGER
+  is_default : BOOLEAN
+  created_at : DATETIME
+  updated_at : DATETIME
+}
+
+entity "dvds" as dvds {
+  pk(id) : INTEGER
+  --
+  title : STRING
+  director : STRING
+  genre : STRING
+  release_year : INTEGER
+  description : TEXT
+  rental_price_cents : INTEGER
+  total_copies : INTEGER
+  available_copies : INTEGER
+  is_active : BOOLEAN
+  created_at : DATETIME
+  updated_at : DATETIME
+}
+
+entity "shopping_carts" as shopping_carts {
+  pk(id) : INTEGER
+  --
+  fk(user_id) : INTEGER
+  status : STRING <<active|converted|abandoned>>
+  created_at : DATETIME
+  updated_at : DATETIME
+}
+
+entity "shopping_cart_items" as shopping_cart_items {
+  pk(id) : INTEGER
+  --
+  fk(cart_id) : INTEGER
+  fk(dvd_id) : INTEGER
+  quantity : INTEGER
+  unit_price_cents : INTEGER
+  created_at : DATETIME
+  updated_at : DATETIME
+}
+
+entity "orders" as orders {
+  pk(id) : INTEGER
+  --
+  fk(user_id) : INTEGER
+  fk(payment_method_id) : INTEGER
+  order_date : DATETIME
+  subtotal_cents : INTEGER
+  tax_cents : INTEGER
+  total_cents : INTEGER
+  status : STRING <<pending|placed|cancelled>>
+  created_at : DATETIME
+  updated_at : DATETIME
+}
+
+entity "order_items" as order_items {
+  pk(id) : INTEGER
+  --
+  fk(order_id) : INTEGER
+  fk(dvd_id) : INTEGER
+  quantity : INTEGER
+  unit_price_cents : INTEGER
+  total_price_cents : INTEGER
+  created_at : DATETIME
+}
+
+users ||--o{ password_history : "ON DELETE CASCADE"
+users ||--o{ payment_methods : "ON DELETE CASCADE"
+users ||--o{ shopping_carts : "ON DELETE CASCADE"
+users ||--o{ orders : "ON DELETE RESTRICT"
+payment_methods ||--o{ orders : "ON DELETE RESTRICT"
+shopping_carts ||--o{ shopping_cart_items : "ON DELETE CASCADE"
+dvds ||--o{ shopping_cart_items : "ON DELETE RESTRICT"
+dvds ||--o{ order_items : "ON DELETE RESTRICT"
+orders ||--o{ order_items : "ON DELETE CASCADE"
+
+@enduml

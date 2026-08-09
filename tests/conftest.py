@@ -15,7 +15,7 @@ import pytest
 from werkzeug.serving import make_server
 
 from app import create_app
-from db import get_engine
+from app.db import get_engine
 
 playwright_sync_api = pytest.importorskip("playwright.sync_api")
 sync_playwright = playwright_sync_api.sync_playwright
