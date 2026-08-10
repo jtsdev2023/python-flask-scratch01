@@ -5,6 +5,7 @@ import re
 from test_support import build_user_payload
 
 
+# fills out the registration form fields from a user payload
 def fill_register_form(page, user_payload: dict):
     page.get_by_label("First name").fill(user_payload["first_name"])
     page.get_by_label("Last name").fill(user_payload["last_name"])
@@ -22,6 +23,7 @@ def fill_register_form(page, user_payload: dict):
     page.get_by_label("Year").fill(str(user_payload["payment_method"]["card_exp_year"]))
 
 
+# registers a new user through the browser ui
 def register_user_via_browser(page, live_server: str) -> dict:
     user_payload = build_user_payload()
     page.goto(f"{live_server}/register")
@@ -32,6 +34,7 @@ def register_user_via_browser(page, live_server: str) -> dict:
     return user_payload
 
 
+# creates a user directly through the api for browser-login tests
 def create_user_via_api(flask_app) -> dict:
     user_payload = build_user_payload()
     client = flask_app.test_client()
@@ -40,6 +43,7 @@ def create_user_via_api(flask_app) -> dict:
     return user_payload
 
 
+# logs an existing user in through the browser ui
 def login_user_via_browser(page, live_server: str, user_payload: dict):
     page.goto(f"{live_server}/login")
     page.get_by_label("Email address").fill(user_payload["email"])
@@ -49,6 +53,7 @@ def login_user_via_browser(page, live_server: str, user_payload: dict):
     page.locator("#catalog-grid .catalog-card").first.wait_for()
 
 
+# adds the first catalog card's dvd to the cart
 def add_first_catalog_item_to_cart(page):
     first_card = page.locator("#catalog-grid .catalog-card").first
     item_title = first_card.locator("h2").text_content().strip()
@@ -57,11 +62,13 @@ def add_first_catalog_item_to_cart(page):
     return item_title
 
 
+# navigates to the cart page and waits for it to finish loading
 def open_cart(page, live_server: str):
     page.goto(f"{live_server}/cart")
     page.locator("#cart-loading").wait_for(state="hidden")
 
 
+# registering through the ui signs the user in and lands on the catalog
 def test_register_page_creates_account_and_redirects_to_catalog(page, live_server):
     register_user_via_browser(page, live_server)
 
@@ -70,6 +77,7 @@ def test_register_page_creates_account_and_redirects_to_catalog(page, live_serve
     assert "Catalog" in page.title()
 
 
+# logging in through the ui signs in an existing user
 def test_login_page_signs_in_existing_user(page, live_server, flask_app):
     user_payload = create_user_via_api(flask_app)
 
@@ -80,6 +88,7 @@ def test_login_page_signs_in_existing_user(page, live_server, flask_app):
     assert "Catalog" in page.title()
 
 
+# the logout button clears the session and returns to the home page
 def test_logout_button_signs_user_out_and_returns_to_home(page, live_server):
     register_user_via_browser(page, live_server)
 
@@ -91,6 +100,7 @@ def test_logout_button_signs_user_out_and_returns_to_home(page, live_server):
     assert page.locator("[data-logout-button]").count() == 0
 
 
+# the cart page can add and then remove a catalog item
 def test_cart_page_adds_and_removes_items(page, live_server):
     register_user_via_browser(page, live_server)
     item_title = add_first_catalog_item_to_cart(page)
@@ -107,6 +117,7 @@ def test_cart_page_adds_and_removes_items(page, live_server):
     assert page.locator("#checkout-button").is_disabled()
 
 
+# checkout places an order and leaves behind a fresh empty cart
 def test_checkout_flow_places_order_and_returns_to_empty_active_cart(page, live_server):
     register_user_via_browser(page, live_server)
     item_title = add_first_catalog_item_to_cart(page)

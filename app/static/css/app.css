@@ -1,3 +1,4 @@
+/* shared color and shadows used in stylesheet */
 :root {
     --ink: #132238;
     --navy: #183a5a;
@@ -18,6 +19,7 @@ body {
         linear-gradient(180deg, #f4efe5 0%, #fffdf8 45%, #f0ece4 100%);
 }
 
+/* "jeremy flix" heading color */
 .jeremy-flix {
     /* color: red; */
     color: darkorange;
@@ -25,6 +27,7 @@ body {
     font-weight: 600
 }
 
+/* consistent sans-serif font for all headings and brand mark */
 h1, h2, h3, h4, h5, .brand-mark {
     /* font-family: "Fraunces", sans-serif; */
     /* want sans-serif style font */
@@ -40,25 +43,30 @@ h1, h2, h3, h4, h5, .brand-mark {
     font-weight: 600;
 }
 
+/* full-height page wrapper */
 .page-shell {
     min-height: 100vh;
 }
 
+/* top navigation bar background */
 .site-nav {
     background: linear-gradient(135deg, rgba(15, 37, 59, 0.95), rgba(32, 66, 100, 0.95));
     box-shadow: 0 8px 30px rgba(10, 24, 39, 0.16);
 }
 
+/* nav bar brand text color */
 .brand-mark {
     letter-spacing: 0.01em;
     /* make match body jeremy flix color */
     color: darkorange;
 }
 
+/* space below the main content area */
 .page-main {
     padding-bottom: 4rem;
 }
 
+/* small uppercase label used above section headings */
 .eyebrow {
     display: inline-block;
     text-transform: uppercase;
@@ -68,6 +76,7 @@ h1, h2, h3, h4, h5, .brand-mark {
     color: #8a5b11;
 }
 
+/* shared card styling for panels across the site */
 .hero-panel,
 .surface-card,
 .feature-card,
@@ -80,6 +89,7 @@ h1, h2, h3, h4, h5, .brand-mark {
     color: white;
 }
 
+/* home page banner background */
 .hero-panel {
     background:
         linear-gradient(135deg, rgba(24, 58, 90, 0.97), rgba(33, 74, 112, 0.9)),
@@ -96,26 +106,31 @@ h1, h2, h3, h4, h5, .brand-mark {
     max-width: 42rem;
 }
 
+/* rounded corners for card-style panels */
 .feature-card,
 .info-card,
 .surface-card {
     border-radius: 1.25rem;
 }
 
+/* inner padding for feature/info cards */
 .feature-card,
 .info-card {
     padding: 1.5rem;
 }
 
+/* mvp feature list spacing and color */
 .feature-list {
     padding-left: 1.1rem;
     color: white;
 }
 
+/* spacing between password rule list items */
 .feature-list li + li {
     margin-top: 0.75rem;
 }
 
+/* registration page password rules panel */
 .password-guide {
     min-width: 16rem;
     background: rgba(24, 58, 90, 0.05);
@@ -123,6 +138,7 @@ h1, h2, h3, h4, h5, .brand-mark {
     padding: 1rem 1.1rem;
 }
 
+/* catalog dvd card container */
 .catalog-card {
     background: rgba(255, 255, 255, 0.88);
     border: 1px solid rgba(24, 58, 90, 0.08);
@@ -131,16 +147,19 @@ h1, h2, h3, h4, h5, .brand-mark {
     height: 100%;
 }
 
+/* stacks catalog card content vertically */
 .catalog-card .card-body {
     display: flex;
     flex-direction: column;
 }
 
+/* secondary catalog card text (director, genre, year) */
 .catalog-meta {
     color: var(--slate);
     font-size: 0.95rem;
 }
 
+/* shared pill shape for price and status badges */
 .price-pill,
 .status-pill {
     display: inline-flex;
@@ -151,16 +170,19 @@ h1, h2, h3, h4, h5, .brand-mark {
     font-weight: 700;
 }
 
+/* rental price pill colors */
 .price-pill {
     background: rgba(215, 168, 75, 0.18);
     color: #7d5613;
 }
 
+/* availability/order status pill colors */
 .status-pill {
     background: rgba(24, 58, 90, 0.1);
     color: var(--navy);
 }
 
+/* label/value grid layout for cart and order summaries */
 .summary-list {
     display: grid;
     grid-template-columns: 1fr auto;
@@ -168,15 +190,18 @@ h1, h2, h3, h4, h5, .brand-mark {
     column-gap: 1rem;
 }
 
+/* removes default margin from summary list terms/definitions */
 .summary-list dt,
 .summary-list dd {
     margin: 0;
 }
 
+/* bolds summary list values */
 .summary-list dd {
     font-weight: 700;
 }
 
+/* shared card styling for cart and order line items */
 .cart-item,
 .order-item {
     border: 1px solid rgba(24, 58, 90, 0.08);
@@ -185,15 +210,18 @@ h1, h2, h3, h4, h5, .brand-mark {
     background: rgba(255, 255, 255, 0.74);
 }
 
+/* keeps the cart order-summary panel visible while scrolling */
 .sticky-summary {
     position: sticky;
     top: 1.25rem;
 }
 
+/* order confirmation banner background */
 .order-hero {
     background: linear-gradient(135deg, rgba(255, 250, 240, 0.96), rgba(244, 234, 208, 0.96));
 }
 
+/* consistent gold focus ring for form controls and buttons */
 .form-control:focus,
 .form-select:focus,
 .btn:focus {
@@ -201,6 +229,7 @@ h1, h2, h3, h4, h5, .brand-mark {
     border-color: rgba(215, 168, 75, 0.8);
 }
 
+/* lightens muted text on dark backgrounds */
 .text-light-emphasis {
     color: rgba(255, 255, 255, 0.82) !important;
 }
@@ -226,6 +255,7 @@ h1, h2, h3, h4, h5, .brand-mark {
     color: white;
 }
 
+/* registration form section label colors */
 .password-rules, .new-account, .payment-method {
     color: darkorange;
 }

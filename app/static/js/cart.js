@@ -5,6 +5,7 @@ const cartState = {
     paymentMethodId: null,
 };
 
+// renders subtotal/tax/total summary list
 function renderSummary(target, summary) {
     target.innerHTML = `
         <dt>Subtotal</dt><dd>${formatCurrency(summary.subtotal)}</dd>
@@ -13,6 +14,7 @@ function renderSummary(target, summary) {
     `;
 }
 
+// renders each cart line item w/ remove button
 function renderCartItems(items, container, feedback, refreshFn) {
     container.innerHTML = "";
     for (const item of items) {
@@ -50,6 +52,7 @@ function renderCartItems(items, container, feedback, refreshFn) {
     }
 }
 
+// loads cart page... renders contents w/ checkout
 export function initCartPage() {
     const loading = document.getElementById("cart-loading");
     const emptyState = document.getElementById("cart-empty");
@@ -61,6 +64,7 @@ export function initCartPage() {
         return;
     }
 
+    // renders current cart state... toggling empty-cart view
     async function renderCart(cartData) {
         cartState.cartId = cartData.cart.id;
         loading.classList.add("d-none");
@@ -80,6 +84,7 @@ export function initCartPage() {
         renderCartItems(cartData.items, itemsContainer, feedback, renderCart);
     }
 
+    // fetches profile and active cart... then renders cart
     async function loadCart() {
         hideAlert(feedback);
         try {

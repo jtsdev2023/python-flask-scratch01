@@ -8,48 +8,57 @@ import pytest
 from test_support import generate_unique_email, load_user_payloads
 
 
+# test client w/ no logged-in user
 @pytest.fixture
 def anonymous_client(flask_app):
     return flask_app.test_client()
 
 
+# test client used to act as "user a"
 @pytest.fixture
 def client_a(flask_app):
     return flask_app.test_client()
 
 
+# test client used to act as "user b"
 @pytest.fixture
 def client_b(flask_app):
     return flask_app.test_client()
 
 
+# loads the shared smoke-test user payloads w/ unique emails
 @pytest.fixture
 def user_payloads() -> list[dict]:
     return load_user_payloads()
 
 
+# payload for the first sample user
 @pytest.fixture
 def user_a_payload(user_payloads) -> dict:
     return copy.deepcopy(user_payloads[0])
 
 
+# payload for the second sample user
 @pytest.fixture
 def user_b_payload(user_payloads) -> dict:
     return copy.deepcopy(user_payloads[1])
 
 
+# registers a user via the api and asserts success
 def register_user(client, payload: dict) -> dict:
     response = client.post("/api/register", json=payload)
     assert response.status_code == 201, response.get_json()
     return response.get_json()
 
 
+# logs in a user via the api and asserts success
 def login_user(client, email: str, password: str) -> dict:
     response = client.post("/api/login", json={"email": email, "password": password})
     assert response.status_code == 200, response.get_json()
     return response.get_json()
 
 
+# health endpoint responds ok
 def test_health_check(anonymous_client):
     response = anonymous_client.get("/api/health")
 
@@ -57,6 +66,7 @@ def test_health_check(anonymous_client):
     assert response.get_json() == {"status": "ok"}
 
 
+# catalog endpoint returns seeded dvds
 def test_list_dvds_returns_items(anonymous_client):
     response = anonymous_client.get("/api/dvds")
 
@@ -65,6 +75,7 @@ def test_list_dvds_returns_items(anonymous_client):
     assert data["items"]
 
 
+# profile endpoint requires authentication
 def test_unauthenticated_me_returns_401(anonymous_client):
     response = anonymous_client.get("/api/me")
 
@@ -72,6 +83,7 @@ def test_unauthenticated_me_returns_401(anonymous_client):
     assert response.get_json()["error"] == "Authentication required."
 
 
+# registration signs the user in and opens an active cart
 def test_register_user_creates_session_and_active_cart(client_a, user_a_payload):
     register_data = register_user(client_a, user_a_payload)
 
@@ -84,6 +96,7 @@ def test_register_user_creates_session_and_active_cart(client_a, user_a_payload)
     assert register_data["cart"]["status"] == "active"
 
 
+# registering the same email twice is rejected as a conflict
 def test_duplicate_registration_returns_409(client_b, user_b_payload):
     register_user(client_b, user_b_payload)
 
@@ -93,6 +106,7 @@ def test_duplicate_registration_returns_409(client_b, user_b_payload):
     assert duplicate_response.get_json()["error"] == "An account with that email already exists."
 
 
+# weak passwords are rejected during registration
 def test_weak_password_returns_400(anonymous_client, user_b_payload):
     weak_password_payload = copy.deepcopy(user_b_payload)
     weak_password_payload["email"] = f"weak+{uuid4().hex[:8]}@example.com"
@@ -104,6 +118,7 @@ def test_weak_password_returns_400(anonymous_client, user_b_payload):
     assert "Password must be at least" in response.get_json()["error"]
 
 
+# a user cannot view another user's cart
 def test_cross_user_cart_access_returns_404(client_a, client_b, user_a_payload, user_b_payload):
     register_a = register_user(client_a, user_a_payload)
     register_user(client_b, user_b_payload)
@@ -115,6 +130,7 @@ def test_cross_user_cart_access_returns_404(client_a, client_b, user_a_payload, 
     assert response.get_json()["error"] == "Cart not found."
 
 
+# logout clears the session for subsequent authenticated requests
 def test_logout_clears_session(client_b, user_b_payload):
     register_user(client_b, user_b_payload)
 
@@ -127,6 +143,7 @@ def test_logout_clears_session(client_b, user_b_payload):
     assert me_response.status_code == 401
     assert cart_response.status_code == 401
 
+# wrong password after logout returns a generic invalid-credentials error
 def test_invalid_login_returns_400(client_b, user_b_payload):
     register_user(client_b, user_b_payload)
     client_b.post("/api/logout")
@@ -140,6 +157,7 @@ def test_invalid_login_returns_400(client_b, user_b_payload):
     assert response.get_json()["error"] == "Invalid email or password."
 
 
+# logging in as a nonexistent user returns 400, not a traceback
 def test_nonexistent_user_login_returns_400(client_b):
     response = client_b.post(
         "/api/login",
@@ -150,6 +168,7 @@ def test_nonexistent_user_login_returns_400(client_b):
     assert response.get_json()["error"] == "Invalid email or password."
 
 
+# logging back in returns the same profile and active cart
 def test_login_returns_profile_and_expected_active_cart(client_b, user_b_payload):
     register_data = register_user(client_b, user_b_payload)
     cart_b_id = register_data["cart"]["id"]
@@ -165,6 +184,7 @@ def test_login_returns_profile_and_expected_active_cart(client_b, user_b_payload
     assert cart_response.get_json()["cart"]["id"] == cart_b_id
 
 
+# checking out an empty cart is rejected as a conflict
 def test_empty_cart_checkout_returns_409(client_b, user_b_payload):
     register_data = register_user(client_b, user_b_payload)
 
@@ -180,6 +200,7 @@ def test_empty_cart_checkout_returns_409(client_b, user_b_payload):
     assert response.get_json()["error"] == "Cannot checkout an empty cart."
 
 
+# adding an item is reflected when the cart is viewed afterward
 def test_add_item_then_view_cart(client_b, anonymous_client, user_b_payload):
     register_data = register_user(client_b, user_b_payload)
     cart_b_id = register_data["cart"]["id"]
@@ -200,6 +221,7 @@ def test_add_item_then_view_cart(client_b, anonymous_client, user_b_payload):
     assert view_response.get_json()["summary"]["total"] == add_data["summary"]["total"]
 
 
+# viewing a nonexistent cart returns 404
 def test_missing_cart_returns_404(client_b, user_b_payload):
     register_user(client_b, user_b_payload)
 
@@ -209,6 +231,7 @@ def test_missing_cart_returns_404(client_b, user_b_payload):
     assert response.get_json()["error"] == "Cart not found."
 
 
+# checkout creates an order, opens a new cart, and locks the old cart
 def test_checkout_creates_order_and_new_active_cart(client_b, anonymous_client, user_b_payload):
     register_data = register_user(client_b, user_b_payload)
     cart_b_id = register_data["cart"]["id"]
@@ -244,6 +267,7 @@ def test_checkout_creates_order_and_new_active_cart(client_b, anonymous_client, 
     assert delete_after_checkout.status_code == 409
 
 
+# a user cannot view another user's order
 def test_cross_user_order_access_returns_404(client_a, client_b, anonymous_client, user_a_payload, user_b_payload):
     register_user(client_a, user_a_payload)
     register_b = register_user(client_b, user_b_payload)

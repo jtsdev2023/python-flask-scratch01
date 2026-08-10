@@ -17,10 +17,12 @@ BASE_DIR = Path(__file__).resolve().parent
 SEED_PATH = BASE_DIR / "seed.json"
 
 
+# creates tables from orm metadata if missing
 def create_database(app: Flask | None = None) -> None:
     Base.metadata.create_all(bind=get_engine(app))
 
 
+# queries dvd catalog w/ optional title/genre filters
 def query_dvds(
     title_search: str = "%",
     genre: str | None = None,
@@ -37,6 +39,7 @@ def query_dvds(
         return list(session.scalars(statement))
 
 
+# loads seed catalog from seed.json into dvds table
 def seed_database(app: Flask | None = None) -> None:
     if not SEED_PATH.exists():
         raise FileNotFoundError(f"Seed file not found: {SEED_PATH.resolve()}")
@@ -69,6 +72,7 @@ def seed_database(app: Flask | None = None) -> None:
         session.execute(statement)
 
 
+# creates tables and seeds the catalog if empty
 def ensure_database_ready(app: Flask | None = None) -> None:
     create_database(app)
     with session_scope(app) as session:
@@ -78,7 +82,7 @@ def ensure_database_ready(app: Flask | None = None) -> None:
 
 
 if __name__ == "__main__":
-    # relative imports require invocation as `python -m app.python_db`
+    # relative imports w/ `python -m app.python_db`
     scratch_app = Flask(__name__)
     scratch_app.config["DATABASE_URL"] = DEFAULT_DATABASE_URL
     init_app(scratch_app)

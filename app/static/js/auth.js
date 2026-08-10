@@ -1,9 +1,11 @@
 import { apiRequest, hideAlert, setButtonBusy, showAlert } from "./api.js";
 
+// converts form's fields into plain object
 function formDataToObject(form) {
     return Object.fromEntries(new FormData(form).entries());
 }
 
+// logout button to clear session and redirect home
 export function initLogoutButton() {
     const logoutButton = document.querySelector("[data-logout-button]");
     if (!logoutButton) {
@@ -22,6 +24,7 @@ export function initLogoutButton() {
     });
 }
 
+// login form submission
 export function initLoginPage() {
     const form = document.getElementById("login-form");
     const alert = document.getElementById("form-alert");
@@ -48,6 +51,7 @@ export function initLoginPage() {
     });
 }
 
+// registration form submission
 export function initRegisterPage() {
     const form = document.getElementById("register-form");
     const alert = document.getElementById("form-alert");

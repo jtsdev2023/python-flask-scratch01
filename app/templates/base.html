@@ -1,3 +1,4 @@
+{# shared page shell: head assets, navbar, alert placeholder, and content block #}
 <!doctype html>
 <html lang="en">
 <head>
@@ -12,6 +13,7 @@
 </head>
 <body data-page="{{ page_name }}"{% if order_id is defined %} data-order-id="{{ order_id }}"{% endif %}>
     <div class="page-shell">
+        {# top navigation bar, with links that change based on auth state #}
         <nav class="navbar navbar-expand-lg navbar-dark site-nav">
             <div class="container">
                 <a class="navbar-brand brand-mark" href="{{ url_for('home_page') }}">Jeremy Flix DVD Rental</a>
@@ -44,6 +46,7 @@
             </div>
         </nav>
 
+        {# main content area; child templates fill the content block #}
         <main class="page-main">
             <div class="container py-4 py-lg-5">
                 <div id="page-alert" class="alert d-none" role="alert"></div>

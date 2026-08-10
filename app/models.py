@@ -19,10 +19,12 @@ from sqlalchemy import (
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 
 
+# declarative base class for all sqlalchemy orm models
 class Base(DeclarativeBase):
     pass
 
 
+# add created/updated timestamp columns
 class TimestampCLS:
     created_at: Mapped[datetime] = mapped_column(
         DateTime,
@@ -37,6 +39,7 @@ class TimestampCLS:
     )
 
 
+# registered account with login, contact, and billing info
 class User(TimestampCLS, Base):
     __tablename__ = "users"
     __table_args__ = (
@@ -77,6 +80,7 @@ class User(TimestampCLS, Base):
     orders: Mapped[list["Order"]] = relationship(back_populates="user")
 
 
+# hashed history of a user's past passwords, used for password re-use policy
 class PasswordHistory(Base):
     __tablename__ = "password_history"
     __table_args__ = (
@@ -99,6 +103,7 @@ class PasswordHistory(Base):
     user: Mapped[User] = relationship(back_populates="password_history_entries")
 
 
+# [dummy] user payment method
 class PaymentMethod(TimestampCLS, Base):
     __tablename__ = "payment_methods"
     __table_args__ = (
@@ -130,6 +135,7 @@ class PaymentMethod(TimestampCLS, Base):
     orders: Mapped[list["Order"]] = relationship(back_populates="payment_method")
 
 
+# catalog title w/ pricing and inventory counts
 class Dvd(TimestampCLS, Base):
     __tablename__ = "dvds"
     __table_args__ = (
@@ -170,6 +176,7 @@ class Dvd(TimestampCLS, Base):
     order_items: Mapped[list["OrderItem"]] = relationship(back_populates="dvd")
 
 
+# a user's cart and lifecycle status
 class ShoppingCart(TimestampCLS, Base):
     __tablename__ = "shopping_carts"
     __table_args__ = (
@@ -199,6 +206,7 @@ class ShoppingCart(TimestampCLS, Base):
     )
 
 
+# single dvd line item in a cart
 class ShoppingCartItem(TimestampCLS, Base):
     __tablename__ = "shopping_cart_items"
     __table_args__ = (
@@ -224,6 +232,7 @@ class ShoppingCartItem(TimestampCLS, Base):
     dvd: Mapped[Dvd] = relationship(back_populates="cart_items")
 
 
+# complete simulated checkout transaction
 class Order(TimestampCLS, Base):
     __tablename__ = "orders"
     __table_args__ = (
@@ -269,6 +278,7 @@ class Order(TimestampCLS, Base):
     )
 
 
+# single dvd line item in completed order
 class OrderItem(Base):
     __tablename__ = "order_items"
     __table_args__ = (

@@ -1,5 +1,6 @@
 import { apiRequest, formatCurrency, hideAlert, showAlert } from "./api.js";
 
+// renders subtotal/tax/total summary list for order
 function renderSummary(target, order) {
     target.innerHTML = `
         <dt>Subtotal</dt><dd>${formatCurrency(order.subtotal)}</dd>
@@ -8,6 +9,7 @@ function renderSummary(target, order) {
     `;
 }
 
+// loads and renders single order details
 export function initOrderPage() {
     const orderId = document.body.dataset.orderId;
     const loading = document.getElementById("order-loading");
@@ -23,6 +25,7 @@ export function initOrderPage() {
         return;
     }
 
+    // fetches order and populates page
     async function loadOrder() {
         hideAlert(feedback);
         try {

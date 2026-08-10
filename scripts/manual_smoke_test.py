@@ -17,6 +17,7 @@ from app.db import get_engine
 from tests.test_support import load_user_payloads
 
 
+# raises if response status code not match expected
 def expect_status(response, expected_status: int, label: str):
     if response.status_code != expected_status:
         raise AssertionError(
@@ -24,6 +25,7 @@ def expect_status(response, expected_status: int, label: str):
         )
 
 
+# test main api flows against isolated in-memory temp database
 def main() -> int:
     with TemporaryDirectory(prefix="scratch01-manualtest-") as tmpdir:
         temp_db_path = Path(tmpdir) / "manual_smoke_test.db"

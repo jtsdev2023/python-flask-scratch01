@@ -1,3 +1,4 @@
+// parses fetch response body as json... allow empty/invalid bodies
 async function parseJson(response) {
     const text = await response.text();
     if (!text) {
@@ -10,6 +11,7 @@ async function parseJson(response) {
     }
 }
 
+// sends json fetch request and redirect to login on http 401
 export async function apiRequest(url, options = {}) {
     const response = await fetch(url, {
         credentials: "same-origin",
@@ -37,10 +39,12 @@ export async function apiRequest(url, options = {}) {
     return data;
 }
 
+// returns shared page-level alert element
 export function getPageAlert() {
     return document.getElementById("page-alert");
 }
 
+// shows alert message w/ bootstrap variant style
 export function showAlert(element, message, variant = "danger") {
     if (!element) {
         return;
@@ -50,6 +54,7 @@ export function showAlert(element, message, variant = "danger") {
     element.classList.remove("d-none");
 }
 
+// clears and hides alert element
 export function hideAlert(element) {
     if (!element) {
         return;
@@ -58,6 +63,7 @@ export function hideAlert(element) {
     element.className = "alert d-none";
 }
 
+// disables a button and swaps label while action is in progress
 export function setButtonBusy(button, isBusy, busyText = "Working...") {
     if (!button) {
         return;
@@ -69,6 +75,7 @@ export function setButtonBusy(button, isBusy, busyText = "Working...") {
     button.textContent = isBusy ? busyText : button.dataset.defaultText;
 }
 
+// format decimal price string as currency
 export function formatCurrency(value) {
     return `$${value}`;
 }

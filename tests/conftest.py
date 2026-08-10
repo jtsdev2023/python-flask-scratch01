@@ -22,12 +22,14 @@ sync_playwright = playwright_sync_api.sync_playwright
 PlaywrightError = playwright_sync_api.Error
 
 
+# run flask server background thread for browser tests
 class LiveServer:
     def __init__(self, app):
         self._server = make_server("127.0.0.1", 0, app)
         self._thread = Thread(target=self._server.serve_forever, daemon=True)
         self.base_url = f"http://127.0.0.1:{self._server.server_port}"
 
+    # start server thread and wait until it responds to health check
     def start(self):
         self._thread.start()
         deadline = time.time() + 5
@@ -40,14 +42,16 @@ class LiveServer:
                 time.sleep(0.05)
         raise RuntimeError("Live test server did not become ready in time.")
 
+    # shut down server thread
     def stop(self):
         self._server.shutdown()
         self._thread.join(timeout=5)
 
 
 @pytest.fixture
+# flask app configured w/ new temp sqlite database per test
 def flask_app(tmp_path):
-    # Each test gets a fresh seeded SQLite database via the app factory config.
+    # each test gets new seeded SQLite database via the app factory config.
     temp_db_path = tmp_path / "playwright-tests.db"
     app = create_app(
         {
@@ -60,6 +64,7 @@ def flask_app(tmp_path):
 
 
 @pytest.fixture
+# live http server wrapping test flask app for browser-driven tests
 def live_server(flask_app):
     server = LiveServer(flask_app)
     server.start()
@@ -68,6 +73,7 @@ def live_server(flask_app):
 
 
 @pytest.fixture
+# headless chromium browser instance... skipped if dependencies missing
 def browser():
     with sync_playwright() as playwright:
         try:
@@ -89,6 +95,7 @@ def browser():
 
 
 @pytest.fixture
+# new browser page/context for each test
 def page(browser):
     context = browser.new_context(base_url="http://127.0.0.1")
     page = context.new_page()

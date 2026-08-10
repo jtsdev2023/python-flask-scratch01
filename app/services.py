@@ -20,30 +20,37 @@ PASSWORD_ITERATIONS = 100_000
 PASSWORD_MIN_LENGTH = 12
 
 
+# base class for all service-layer errors
 class ServiceError(Exception):
     pass
 
 
+# raised for input data validation fail
 class ValidationError(ServiceError):
     pass
 
 
+# raised for request authentication error
 class AuthenticationError(ServiceError):
     pass
 
 
+# raised for requested record not exist error
 class NotFoundError(ServiceError):
     pass
 
 
+# raised for request conflict w/ current state error
 class ConflictError(ServiceError):
     pass
 
 
+# normalize email
 def _normalize_email(email: str) -> str:
     return email.strip().lower()
 
 
+# returns list of password strength violations
 def _password_strength_errors(password: str) -> list[str]:
     errors = []
     if len(password) < PASSWORD_MIN_LENGTH:
@@ -59,6 +66,7 @@ def _password_strength_errors(password: str) -> list[str]:
     return errors
 
 
+# hashes password with pbkdf2-hmac-sha256
 def hash_password(password: str, salt: bytes | None = None) -> str:
     salt = salt or secrets.token_bytes(16)
     derived = hashlib.pbkdf2_hmac(
@@ -70,6 +78,8 @@ def hash_password(password: str, salt: bytes | None = None) -> str:
     return f"pbkdf2_sha256${PASSWORD_ITERATIONS}${salt.hex()}${derived.hex()}"
 
 
+# checks plaintext password against a stored pbkdf2 hash
+# NOTE: this may be where existing user re-login error is happening                 <----- NOTE
 def verify_password(password: str, stored_hash: str) -> bool:
     try:
         algorithm, _iterations, salt_hex, _digest_hex = stored_hash.split("$", 3)
@@ -81,10 +91,12 @@ def verify_password(password: str, stored_hash: str) -> bool:
     return hmac.compare_digest(comparison, stored_hash)
 
 
+# formats money cents type "int" as decimal string, e.g. "4.27"
 def _cents_to_decimal(cents: int) -> str:
     return f"{Decimal(cents) / Decimal('100'):.2f}"
 
 
+# formats datetime value for json output
 def _format_datetime(value: datetime | str | None) -> str | None:
     if value is None:
         return None
@@ -93,6 +105,7 @@ def _format_datetime(value: datetime | str | None) -> str | None:
     return value.strftime("%Y-%m-%d %H:%M:%S")
 
 
+# validates and normalizes phone number to digits only
 def _validate_phone_number(phone_number: str) -> str:
     normalized = re.sub(r"[\s\-().]", "", phone_number)
     if not re.fullmatch(r"\d{10,15}", normalized):
@@ -100,6 +113,7 @@ def _validate_phone_number(phone_number: str) -> str:
     return phone_number.strip()
 
 
+# validates and normalizes dummy card number
 def _validate_card_number(card_number: str) -> str:
     normalized = re.sub(r"\s", "", card_number)
     if not re.fullmatch(r"\d{12,19}", normalized):
@@ -107,10 +121,12 @@ def _validate_card_number(card_number: str) -> str:
     return normalized
 
 
+# returns the last four digits of card number
 def _validate_card_last4(card_number: str) -> str:
     return card_number[-4:]
 
 
+# fetches a user or raises if user does not exist
 def _ensure_user_exists(session: Session, user_id: int) -> User:
     user = session.get(User, user_id)
     if user is None:
@@ -118,6 +134,7 @@ def _ensure_user_exists(session: Session, user_id: int) -> User:
     return user
 
 
+# fetches a cart or raises if cart does not exist
 def _ensure_cart(session: Session, cart_id: int) -> ShoppingCart:
     cart = session.get(ShoppingCart, cart_id)
     if cart is None:
@@ -125,6 +142,7 @@ def _ensure_cart(session: Session, cart_id: int) -> ShoppingCart:
     return cart
 
 
+# fetches a payment method or raises if it does not exist
 def _ensure_payment_method(session: Session, payment_method_id: int) -> PaymentMethod:
     payment_method = session.get(PaymentMethod, payment_method_id)
     if payment_method is None:
@@ -132,6 +150,7 @@ def _ensure_payment_method(session: Session, payment_method_id: int) -> PaymentM
     return payment_method
 
 
+# fetches a dvd or raises if dvd does not exist
 def _ensure_dvd(session: Session, dvd_id: int) -> Dvd:
     dvd = session.get(Dvd, dvd_id)
     if dvd is None:
@@ -139,11 +158,13 @@ def _ensure_dvd(session: Session, dvd_id: int) -> Dvd:
     return dvd
 
 
+# raises if the cart does not belong to the current user
 def _ensure_cart_owner(cart: ShoppingCart, current_user_id: int | None) -> None:
     if current_user_id is not None and cart.user_id != current_user_id:
         raise NotFoundError("Cart not found.")
 
 
+# returns a summary of the user's default payment method
 def _get_payment_method_summary(session: Session, user_id: int) -> dict | None:
     payment_method = session.scalar(
         select(PaymentMethod)
@@ -163,6 +184,12 @@ def _get_payment_method_summary(session: Session, user_id: int) -> dict | None:
     }
 
 
+# NOTE: these next to "objects" should probably be represented
+# using python dataclass "object" structures instead of returning
+# these more primative structures
+
+
+# builds small json-safe user summary
 def _user_summary(user: User) -> dict:
     return {
         "id": user.id,
@@ -173,6 +200,7 @@ def _user_summary(user: User) -> dict:
     }
 
 
+# builds json-safe dvd representation
 def _serialize_dvd(dvd: Dvd) -> dict:
     return {
         "id": dvd.id,
@@ -191,6 +219,7 @@ def _serialize_dvd(dvd: Dvd) -> dict:
     }
 
 
+# loads a cart's items w/ dvds joined
 def _cart_items_with_dvds(session: Session, cart_id: int) -> list[ShoppingCartItem]:
     statement = (
         select(ShoppingCartItem)
@@ -201,6 +230,8 @@ def _cart_items_with_dvds(session: Session, cart_id: int) -> list[ShoppingCartIt
     return list(session.scalars(statement))
 
 
+# builds json-safe cart payload w/ items and computed totals
+# NOTE: should probably use python dataclass object
 def _serialize_cart(session: Session, cart: ShoppingCart) -> dict:
     items = []
     subtotal_cents = 0
@@ -253,6 +284,7 @@ def _serialize_cart(session: Session, cart: ShoppingCart) -> dict:
     }
 
 
+# returns user's active cart... creating if not exist
 def _get_or_create_active_cart(session: Session, user_id: int) -> dict:
     _ensure_user_exists(session, user_id)
     active_cart = session.scalar(
@@ -268,6 +300,7 @@ def _get_or_create_active_cart(session: Session, user_id: int) -> dict:
     return _serialize_cart(session, active_cart)
 
 
+# builds profile payload returned after login/registration
 def _profile_payload(session: Session, user: User) -> dict:
     cart_details = _get_or_create_active_cart(session, user.id)
     return {
@@ -280,6 +313,7 @@ def _profile_payload(session: Session, user: User) -> dict:
     }
 
 
+# verifies credentials and returns user's profile payload
 def authenticate_user(email: str, password: str) -> dict:
     with session_scope() as session:
         normalized_email = _normalize_email(email)
@@ -291,17 +325,21 @@ def authenticate_user(email: str, password: str) -> dict:
         return _profile_payload(session, user)
 
 
+# returns profile payload for a given user id
 def get_user_profile(user_id: int) -> dict:
     with session_scope() as session:
         user = _ensure_user_exists(session, user_id)
         return _profile_payload(session, user)
 
 
+# public wrapper to fetch/create a user's active cart
 def get_or_create_active_cart(user_id: int) -> dict:
     with session_scope() as session:
         return _get_or_create_active_cart(session, user_id)
 
 
+# validates input and creates a user, payment method, and starter cart
+# check domain coupling... bad ?
 def create_user(payload: dict) -> dict:
     required_fields = [
         "email",
@@ -422,6 +460,7 @@ def create_user(payload: dict) -> dict:
         }
 
 
+# returns catalog dvds matching given title/genre filters
 def list_dvds(title_search: str = "%", genre: str | None = None, active_only: bool = True) -> list[dict]:
     with session_scope() as session:
         statement = select(Dvd).where(Dvd.title.like(title_search)).order_by(Dvd.title.asc())
@@ -433,6 +472,7 @@ def list_dvds(title_search: str = "%", genre: str | None = None, active_only: bo
         return [_serialize_dvd(dvd) for dvd in dvds]
 
 
+# returns cart's contents... enforce ownership
 def get_cart(cart_id: int, current_user_id: int | None = None) -> dict:
     with session_scope() as session:
         cart = _ensure_cart(session, cart_id)
@@ -441,6 +481,7 @@ def get_cart(cart_id: int, current_user_id: int | None = None) -> dict:
         return _serialize_cart(session, cart)
 
 
+# adds a dvd to active cart and check availability
 def add_item_to_cart(
     cart_id: int,
     dvd_id: int,
@@ -487,6 +528,7 @@ def add_item_to_cart(
         return _serialize_cart(session, cart)
 
 
+# removes an item from active cart
 def remove_item_from_cart(cart_id: int, item_id: int, current_user_id: int | None = None) -> dict:
     with session_scope() as session:
         cart = _ensure_cart(session, cart_id)
@@ -508,6 +550,7 @@ def remove_item_from_cart(cart_id: int, item_id: int, current_user_id: int | Non
         return _serialize_cart(session, cart)
 
 
+# converts a cart into an order and starts a new active cart
 def checkout_cart(cart_id: int, payment_method_id: int, current_user_id: int | None = None) -> dict:
     with session_scope() as session:
         cart = _ensure_cart(session, cart_id)
@@ -587,6 +630,7 @@ def checkout_cart(cart_id: int, payment_method_id: int, current_user_id: int | N
         }
 
 
+# returns a placed order's line items and totals for current user
 def get_order_details(order_id: int, current_user_id: int) -> dict:
     with session_scope() as session:
         order = session.scalar(

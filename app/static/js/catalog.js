@@ -5,6 +5,7 @@ const catalogState = {
     genres: new Set(),
 };
 
+// rebuilds genre filter options from known genres
 function renderGenres(selectElement) {
     const genres = [...catalogState.genres].sort((a, b) => a.localeCompare(b));
     const currentValue = selectElement.dataset.currentValue || "";
@@ -20,6 +21,7 @@ function renderGenres(selectElement) {
     }
 }
 
+// builds single dvd catalog card w/ add-to-cart button
 function createCard(item, feedbackElement) {
     const column = document.createElement("div");
     column.className = "col-md-6 col-xl-4";
@@ -77,6 +79,7 @@ function createCard(item, feedbackElement) {
     return column;
 }
 
+// fetches filtered dvds and renders catalog grid
 async function loadCatalog(form, grid, loading, feedback) {
     hideAlert(feedback);
     loading.classList.remove("d-none");
@@ -126,6 +129,7 @@ async function loadCatalog(form, grid, loading, feedback) {
     }
 }
 
+// filter form and loads dvd catalog page
 export function initCatalogPage() {
     const form = document.getElementById("catalog-filter-form");
     const grid = document.getElementById("catalog-grid");

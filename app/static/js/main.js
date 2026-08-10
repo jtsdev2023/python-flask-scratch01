@@ -11,6 +11,7 @@ const initializers = {
     order: initOrderPage,
 };
 
+// runs logout and initializer for current page
 window.addEventListener("DOMContentLoaded", () => {
     initLogoutButton();
     const pageName = document.body.dataset.page;

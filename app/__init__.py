@@ -23,6 +23,7 @@ from .services import (
 )
 
 
+# builds and configures flask application instance
 def create_app(config: dict | None = None):
     app = Flask(__name__)
     app.config.update(
@@ -38,22 +39,26 @@ def create_app(config: dict | None = None):
     init_app(app)
     ensure_database_ready(app)
 
+    # returns the logged-in user's id or raises api route error
     def _require_session_user_id() -> int:
         user_id = session.get("user_id")
         if user_id is None:
             raise AuthenticationError("Authentication required.")
         return int(user_id)
 
+    # returns the logged-in user's id or redirects to login for page route
     def _require_page_user_id():
         user_id = session.get("user_id")
         if user_id is None:
             return redirect(url_for("login_page"))
         return int(user_id)
 
+    # exposes auth status to each rendered template
     @app.context_processor
     def inject_template_globals():
         return {"is_authenticated": session.get("user_id") is not None}
 
+    # maps service-layer exceptions to matching http status code
     @app.errorhandler(ServiceError)
     def handle_service_error(error):
         if isinstance(error, AuthenticationError):
@@ -68,22 +73,27 @@ def create_app(config: dict | None = None):
             status_code = 500
         return jsonify({"error": str(error)}), status_code
 
+    # redirects the root url to the homepage
     @app.get("/")
     def root_redirect():
         return redirect(url_for("home_page"))
 
+    # renders the homepage
     @app.get("/home")
     def home_page():
         return render_template("index.html", page_title="Home", page_name="home")
 
+    # renders the login page
     @app.get("/login")
     def login_page():
         return render_template("login.html", page_title="Login", page_name="login")
 
+    # renders the registration page
     @app.get("/register")
     def register_page():
         return render_template("register.html", page_title="Register", page_name="register")
 
+    # renders the dvd catalog page for logged-in users
     @app.get("/catalog")
     def catalog_page():
         page_user_id = _require_page_user_id()
@@ -91,6 +101,7 @@ def create_app(config: dict | None = None):
             return page_user_id
         return render_template("catalog.html", page_title="Catalog", page_name="catalog")
 
+    # renders the shopping cart page for logged-in users
     @app.get("/cart")
     def cart_page():
         page_user_id = _require_page_user_id()
@@ -98,6 +109,7 @@ def create_app(config: dict | None = None):
             return page_user_id
         return render_template("cart.html", page_title="Your Cart", page_name="cart")
 
+    # renders the order detail page for logged-in users
     @app.get("/orders/<int:order_id>")
     def order_page(order_id: int):
         page_user_id = _require_page_user_id()
@@ -110,10 +122,12 @@ def create_app(config: dict | None = None):
             order_id=order_id,
         )
 
+    # health check endpoint
     @app.get("/api/health")
     def health_check():
         return jsonify({"status": "ok"})
 
+    # creates a new account and starts a session
     @app.post("/api/register")
     def register_user():
         payload = request.get_json(silent=True) or {}
@@ -121,6 +135,7 @@ def create_app(config: dict | None = None):
         session["user_id"] = result["user"]["id"]
         return jsonify(result), 201
 
+    # authenticates a user and starts a session
     @app.post("/api/login")
     def login_user():
         payload = request.get_json(silent=True) or {}
@@ -132,21 +147,25 @@ def create_app(config: dict | None = None):
         session["user_id"] = result["user"]["id"]
         return jsonify(result)
 
+    # clears the current session
     @app.post("/api/logout")
     def logout_user():
         session.clear()
         return jsonify({"message": "Logged out."})
 
+    # returns the logged-in user's profile
     @app.get("/api/me")
     def current_user_profile():
         user_id = _require_session_user_id()
         return jsonify(get_user_profile(user_id))
 
+    # returns the logged-in user's active cart
     @app.get("/api/me/cart")
     def current_user_cart():
         user_id = _require_session_user_id()
         return jsonify(get_or_create_active_cart(user_id))
 
+    # returns the dvd catalog... can be filtered by title/genre
     @app.get("/api/dvds")
     def browse_dvds():
         title_search = request.args.get("title_search", "%")
@@ -154,11 +173,13 @@ def create_app(config: dict | None = None):
         active_only = request.args.get("active_only", "1") not in {"0", "false", "False"}
         return jsonify({"items": list_dvds(title_search=title_search, genre=genre, active_only=active_only)})
 
+    # returns a cart's contents and computed totals
     @app.get("/api/carts/<int:cart_id>")
     def view_cart(cart_id: int):
         user_id = _require_session_user_id()
         return jsonify(get_cart(cart_id, current_user_id=user_id))
 
+    # adds a dvd to a cart
     @app.post("/api/carts/<int:cart_id>/items")
     def add_cart_item(cart_id: int):
         user_id = _require_session_user_id()
@@ -169,11 +190,13 @@ def create_app(config: dict | None = None):
             raise ValidationError("dvd_id is required.")
         return jsonify(add_item_to_cart(cart_id, int(dvd_id), quantity, current_user_id=user_id)), 201
 
+    # removes an item from a cart
     @app.delete("/api/carts/<int:cart_id>/items/<int:item_id>")
     def delete_cart_item(cart_id: int, item_id: int):
         user_id = _require_session_user_id()
         return jsonify(remove_item_from_cart(cart_id, item_id, current_user_id=user_id))
 
+    # checks out a cart and creates an order
     @app.post("/api/checkout")
     def checkout():
         user_id = _require_session_user_id()
@@ -184,6 +207,7 @@ def create_app(config: dict | None = None):
             raise ValidationError("cart_id and payment_method_id are required.")
         return jsonify(checkout_cart(int(cart_id), int(payment_method_id), current_user_id=user_id)), 201
 
+    # returns order details
     @app.get("/api/orders/<int:order_id>")
     def view_order(order_id: int):
         user_id = _require_session_user_id()
